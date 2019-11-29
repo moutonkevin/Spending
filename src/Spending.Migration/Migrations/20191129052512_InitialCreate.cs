@@ -80,6 +80,33 @@ namespace Spending.Migration.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TransactionDescriptionUserCategory",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(nullable: true),
+                    UserId = table.Column<int>(nullable: false),
+                    CategoryId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransactionDescriptionUserCategory", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TransactionDescriptionUserCategory_Category_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Category",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TransactionDescriptionUserCategory_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Transaction",
                 columns: table => new
                 {
@@ -88,7 +115,6 @@ namespace Spending.Migration.Migrations
                     Amount = table.Column<decimal>(nullable: false),
                     Description = table.Column<string>(nullable: true),
                     Date = table.Column<DateTime>(nullable: false),
-                    CategoryId = table.Column<int>(nullable: false),
                     AccountId = table.Column<int>(nullable: false),
                     TransactionTypeId = table.Column<int>(nullable: false),
                     UserId = table.Column<int>(nullable: false)
@@ -103,12 +129,6 @@ namespace Spending.Migration.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Transaction_Category_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Category",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_Transaction_TransactionType_TransactionTypeId",
                         column: x => x.TransactionTypeId,
                         principalTable: "TransactionType",
@@ -118,6 +138,32 @@ namespace Spending.Migration.Migrations
                         name: "FK_Transaction_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TransactionCategory",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TransactionId = table.Column<int>(nullable: false),
+                    CategoryId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransactionCategory", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TransactionCategory_Category_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Category",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TransactionCategory_Transaction_TransactionId",
+                        column: x => x.TransactionId,
+                        principalTable: "Transaction",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -197,11 +243,6 @@ namespace Spending.Migration.Migrations
                 column: "AccountId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Transaction_CategoryId",
-                table: "Transaction",
-                column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Transaction_TransactionTypeId",
                 table: "Transaction",
                 column: "TransactionTypeId");
@@ -210,18 +251,44 @@ namespace Spending.Migration.Migrations
                 name: "IX_Transaction_UserId",
                 table: "Transaction",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransactionCategory_CategoryId",
+                table: "TransactionCategory",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransactionCategory_TransactionId",
+                table: "TransactionCategory",
+                column: "TransactionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransactionDescriptionUserCategory_CategoryId",
+                table: "TransactionDescriptionUserCategory",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransactionDescriptionUserCategory_UserId",
+                table: "TransactionDescriptionUserCategory",
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "TransactionCategory");
+
+            migrationBuilder.DropTable(
+                name: "TransactionDescriptionUserCategory");
+
+            migrationBuilder.DropTable(
                 name: "Transaction");
 
             migrationBuilder.DropTable(
-                name: "Account");
+                name: "Category");
 
             migrationBuilder.DropTable(
-                name: "Category");
+                name: "Account");
 
             migrationBuilder.DropTable(
                 name: "TransactionType");

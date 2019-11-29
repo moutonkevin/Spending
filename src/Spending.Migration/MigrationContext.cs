@@ -13,6 +13,8 @@ namespace Spending.Migration
         public DbSet<Transaction> Transaction { get; set; }
         public DbSet<TransactionType> TransactionType { get; set; }
         public DbSet<User> User { get; set; }
+        public DbSet<TransactionCategory> TransactionCategory { get; set; }
+        public DbSet<TransactionDescriptionUserCategory> TransactionDescriptionUserCategory { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
