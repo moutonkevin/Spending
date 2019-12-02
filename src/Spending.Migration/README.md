@@ -6,6 +6,10 @@ Install Microsoft.EntityFrameworkCore.Tools to be able to use the Package Manage
 
 Add-Migration InitialCreate
 
+# Apply migrations
+
+Update-Database
+
 # Secrets
 
 ## Init project

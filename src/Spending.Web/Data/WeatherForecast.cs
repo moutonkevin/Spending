@@ -1,6 +1,6 @@
 using System;
 
-namespace Spending.Api
+namespace Spending.Web.Data
 {
     public class WeatherForecast
     {
