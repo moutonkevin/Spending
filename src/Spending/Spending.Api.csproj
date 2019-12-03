@@ -5,6 +5,7 @@
     <UserSecretsId>00409ce7-6d56-47cf-9629-30726eb00b6c</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="itext7" Version="7.1.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.0">
       <PrivateAssets>all</PrivateAssets>
@@ -16,6 +17,5 @@
   <ItemGroup>
     <Folder Include="DataAccess\" />
     <Folder Include="Infrastructure\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 </Project>

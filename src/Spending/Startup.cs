@@ -1,8 +1,11 @@
+using iText.Layout.Element;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Spending.Api.Services;
 
 namespace Spending.Api
 {
@@ -19,6 +22,11 @@ namespace Spending.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddScoped<IFormFileService, FormFileService>();
+            services.AddScoped<ITextExtractorService, TextSharpPdfTextExtractorService>();
+            services.AddScoped<IStatementProcessor, StatementProcessor>();
+            services.AddScoped<IParserService, CommonwealthBankParserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

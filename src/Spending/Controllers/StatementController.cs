@@ -1,9 +1,8 @@
-﻿using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Spending.Api.Services;
 
 namespace Spending.Api.Controllers
 {
@@ -12,24 +11,22 @@ namespace Spending.Api.Controllers
     public class StatementController : ControllerBase
     {
         private readonly ILogger<StatementController> _logger;
+        private readonly IStatementProcessor _statementProcessor;
 
-        public StatementController(ILogger<StatementController> logger)
+        public StatementController(
+            ILogger<StatementController> logger,
+            IStatementProcessor statementProcessor)
         {
             _logger = logger;
+            _statementProcessor = statementProcessor;
         }
 
         [HttpPost]
-        public async Task Upload()
+        public async Task ProcessDocuments()
         {
             if (HttpContext.Request.Form.Files.Any())
             {
-                foreach (var file in HttpContext.Request.Form.Files)
-                {
-                    var ms = new MemoryStream();
-
-                    await file.CopyToAsync(ms);
-                    var fileContentString = Encoding.ASCII.GetString(ms.ToArray());
-                }
+                await _statementProcessor.ProcessAsync(HttpContext.Request.Form.Files);
             }
         }
     }
