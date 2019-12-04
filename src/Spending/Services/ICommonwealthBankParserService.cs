@@ -1,7 +1,10 @@
-﻿namespace Spending.Api.Services
+﻿using Spending.Models;
+using System.Collections.Generic;
+
+namespace Spending.Api.Services
 {
     public interface IParserService
     {
-        void GetTransactions(string content);
+        IList<Transaction> GetTransactions(string content);
     }
 }

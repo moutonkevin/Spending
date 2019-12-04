@@ -78,7 +78,8 @@ namespace Spending.Migration
                 .Entity<TransactionType>()
                 .HasData(
                     new TransactionType { Id = 1, Name = "Debit" },
-                    new TransactionType { Id = 2, Name = "Credit" }
+                    new TransactionType { Id = 2, Name = "Credit" },
+                    new TransactionType { Id = 3, Name = "TransferBetweenAccounts" }
                 );
 
             modelBuilder

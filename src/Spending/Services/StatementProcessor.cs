@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Spending.Api.Models;
 
 namespace Spending.Api.Services
 {
@@ -23,13 +24,15 @@ namespace Spending.Api.Services
             _parserService = parserService;
         }
 
-        public async Task ProcessAsync(IFormFileCollection files)
+        public async Task ProcessAsync(StatementMetadata statementMetadata, IFormFileCollection files)
         {
             foreach (var file in files)
             {
                 var fileStream = await _formFileService.CopyFileAsync(file);
                 var fileContent = _extractorService.GetContent(fileStream);
-                _parserService.GetTransactions(fileContent);
+                var transactions = _parserService.GetTransactions(fileContent);
+
+
             }
         }
     }

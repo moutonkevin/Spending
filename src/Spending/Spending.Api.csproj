@@ -18,4 +18,7 @@
     <Folder Include="DataAccess\" />
     <Folder Include="Infrastructure\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Spending.Models\Spending.Models.csproj" />
+  </ItemGroup>
 </Project>

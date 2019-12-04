@@ -1,7 +1,11 @@
-﻿using System.Linq;
+﻿using System.Buffers;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Spending.Api.Models;
 using Spending.Api.Services;
 
 namespace Spending.Api.Controllers
@@ -24,9 +28,17 @@ namespace Spending.Api.Controllers
         [HttpPost]
         public async Task ProcessDocuments()
         {
+            //[FromBody] StatementMetadata statementMetadata
             if (HttpContext.Request.Form.Files.Any())
             {
-                await _statementProcessor.ProcessAsync(HttpContext.Request.Form.Files);
+                var files = HttpContext.Request.Form.Files;
+                var statementMetadata = JsonConvert.DeserializeObject<StatementMetadata>(HttpContext.Request.Form
+                    .ToArray()
+                    .Where(form => form.Key.Equals("statementMetadata"))
+                    .Select(s => s.Value)
+                    .ToList()[0]);
+
+                await _statementProcessor.ProcessAsync(null, files);
             }
         }
     }

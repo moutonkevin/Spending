@@ -6,5 +6,10 @@
   <ItemGroup>
     <PackageReference Include="BlazorInputFile" Version="0.1.0-preview" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.HttpClient" Version="3.1.0-preview3.19555.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Spending.Models\Spending.Models.csproj" />
+    <ProjectReference Include="..\Spending\Spending.Api.csproj" />
   </ItemGroup>
 </Project>

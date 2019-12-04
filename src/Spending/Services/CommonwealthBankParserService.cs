@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Spending.Api.Models;
+using Spending.Models;
 
 namespace Spending.Api.Services
 {
@@ -33,10 +33,7 @@ namespace Spending.Api.Services
         {
             return section.Split(new[]
             {
-                "TJ\r",
-                "Do\r",
-                "BT\r",
-                "ET\r"
+                "TJ\r"
             }, StringSplitOptions.RemoveEmptyEntries);
         }
 
@@ -53,9 +50,7 @@ namespace Spending.Api.Services
                 {
                     var columnName = ExtractDataFromTransaction(line);
                     if (columnName != null && 
-                        !columnName.Equals("CR") && 
-                        !columnName.StartsWith("$") && 
-                        !columnName.Equals("\\"))
+                        !columnName.Equals("CR"))
                     {
                         columns.Add(columnName);
                     }
@@ -77,23 +72,46 @@ namespace Spending.Api.Services
 
                 if (DateTime.TryParseExact(unfilteredTransaction[0], "dd MMM", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
                 {
-                    transaction.DateTime = new DateTime(DateTime.Now.Year, date.Month, date.Day);
+                    transaction.Date = new DateTime(DateTime.Now.Year, date.Month, date.Day);
+                    unfilteredTransaction.Remove(unfilteredTransaction[0]);
+                }
+
+                var debit = unfilteredTransaction.FirstOrDefault(f => f.Equals("$"));
+                if (debit != null)
+                {
+                    transaction.TransactionTypeId = (int)TransactionTypeEnum.Credit;
+                }
+                else if (unfilteredTransaction.Any(a => a.Contains("Transfer to")) &&
+                         unfilteredTransaction.Any(a => a.Contains("CommBank app")))
+                {
+                    transaction.TransactionTypeId = (int)TransactionTypeEnum.TransferBetweenAccounts;
+                }
+                else
+                {
+                    transaction.TransactionTypeId = (int)TransactionTypeEnum.Debit;
+                }
+
+                unfilteredTransaction.Remove("$");
+                unfilteredTransaction.Remove("\\");
+
+                var balance = unfilteredTransaction.FirstOrDefault(f => f.StartsWith("$") && f.Length > 1);
+                if (balance != null)
+                {
+                    unfilteredTransaction.Remove(balance);
                 }
 
                 var amountString = unfilteredTransaction.LastOrDefault();
                 if (amountString != null && decimal.TryParse(amountString, out var amount))
                 {
                     transaction.Amount = amount;
+                    unfilteredTransaction.Remove(amountString);
                 }
 
-                if (unfilteredTransaction.Count >= 3)
-                {
-                    transaction.Description = string.Join(' ', unfilteredTransaction.Skip(1).Take(unfilteredTransaction.Count - 2));
-                }
+                transaction.Description = string.Join(' ', unfilteredTransaction);
 
                 if (transaction.Amount != default && 
                     transaction.Description != default &&
-                    transaction.DateTime != default)
+                    transaction.Date != default)
                 {
                     identifiedTransactions.Add(transaction);
                 }
@@ -102,12 +120,13 @@ namespace Spending.Api.Services
             return identifiedTransactions;
         }
 
-        public void GetTransactions(string content)
+        public IList<Transaction> GetTransactions(string content)
         {
             var rawSections = ExtractRawSections(content);
-            //var rawTransactions = ExtractRawTransactions(rawSections.ToList());
             var transactions = ExtractTransactions(rawSections.ToList());
             var identifiedTransactions = IdentifyTransactions(transactions);
+
+            return identifiedTransactions;
         }
     }
 }
