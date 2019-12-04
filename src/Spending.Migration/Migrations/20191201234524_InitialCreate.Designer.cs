@@ -10,7 +10,7 @@ using Spending.Migration;
 namespace Spending.Migration.Migrations
 {
     [DbContext(typeof(MigrationContext))]
-    [Migration("20191129052512_InitialCreate")]
+    [Migration("20191201234524_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

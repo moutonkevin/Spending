@@ -4,7 +4,7 @@ using Spending.Api.Models;
 
 namespace Spending.Api.Services
 {
-    public interface IStatementProcessor
+    public interface IStatementService
     {
         Task ProcessAsync(StatementMetadata statementMetadata, IFormFileCollection files);
     }

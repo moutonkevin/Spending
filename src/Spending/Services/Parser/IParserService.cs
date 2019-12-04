@@ -1,7 +1,7 @@
-﻿using Spending.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Spending.Models;
 
-namespace Spending.Api.Services
+namespace Spending.Api.Services.Parser
 {
     public interface IParserService
     {

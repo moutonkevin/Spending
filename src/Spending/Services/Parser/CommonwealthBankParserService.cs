@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Spending.Models;
 
-namespace Spending.Api.Services
+namespace Spending.Api.Services.Parser
 {
     public class CommonwealthBankParserService : IParserService
     {

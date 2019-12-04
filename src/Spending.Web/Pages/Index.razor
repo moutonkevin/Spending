@@ -26,7 +26,7 @@
             <option value=@user.Id>@user.Name</option>
         }
     </select>
-    <InputFile OnChange="HandleFileSelected" />
+    <InputFile multiple OnChange="HandleFileSelected" />
 </div>
 
 @code {
@@ -38,7 +38,10 @@
     readonly List<Bank> _banks = new List<Bank>()
     {
         new Bank { Id = 1, Name = "Commonwealth Bank" },
-        new Bank { Id = 2, Name = "Commonwealth Bank2" }
+        new Bank { Id = 2, Name = "American Express" },
+        new Bank { Id = 3, Name = "CityBank" },
+        new Bank { Id = 4, Name = "Westpac" },
+        new Bank { Id = 5, Name = "Qantas" }
     };
 
     readonly List<Account> _accounts = new List<Account>()
@@ -80,34 +83,10 @@
 
     async Task HandleFileSelected(IFileListEntry[] files)
     {
-        var ms = new MemoryStream();
-        await files[0].Data.CopyToAsync(ms);
-
-        //var file = new ByteArrayContent(ms.GetBuffer());
-        //file.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-        //{
-        //    Name = "\"statementFile\"",
-        //    FileName = files[0].Name
-        //};
-        //file.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
-
-        //var file2 = new StringContent(JsonConvert.SerializeObject(new StatementMetadata
-        //{
-        //    BankId = _bankIdSelected,
-        //    AccountId = _accountIdSelected,
-        //    UserId = _userIdSelected
-        //}));
-        //file2.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-        //{
-        //    Name = "\"statementMetadata\"",
-        //};
-        //file2.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
         try
         {
             var content = new MultipartFormDataContent
             {
-                FormatFileContent(ms.GetBuffer(), "application/pdf", "statementFile", files[0].Name),
                 FormatDataContent(JsonConvert.SerializeObject(new StatementMetadata
                 {
                     BankId = _bankIdSelected,
@@ -115,6 +94,14 @@
                     UserId = _userIdSelected
                 }), "application/json", "statementMetadata")
             };
+
+            foreach (var file in files)
+            {
+                var ms = new MemoryStream();
+                await file.Data.CopyToAsync(ms);
+
+                content.Add(FormatFileContent(ms.GetBuffer(), "application/pdf", "statementFile", file.Name));  
+            }
             var res = Http.PostAsync("https://localhost:5003/api/statement", content);
         }
         catch (Exception e)

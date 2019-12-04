@@ -15,11 +15,11 @@ namespace Spending.Api.Controllers
     public class StatementController : ControllerBase
     {
         private readonly ILogger<StatementController> _logger;
-        private readonly IStatementProcessor _statementProcessor;
+        private readonly IStatementService _statementProcessor;
 
         public StatementController(
             ILogger<StatementController> logger,
-            IStatementProcessor statementProcessor)
+            IStatementService statementProcessor)
         {
             _logger = logger;
             _statementProcessor = statementProcessor;
@@ -28,7 +28,6 @@ namespace Spending.Api.Controllers
         [HttpPost]
         public async Task ProcessDocuments()
         {
-            //[FromBody] StatementMetadata statementMetadata
             if (HttpContext.Request.Form.Files.Any())
             {
                 var files = HttpContext.Request.Form.Files;
@@ -38,7 +37,7 @@ namespace Spending.Api.Controllers
                     .Select(s => s.Value)
                     .ToList()[0]);
 
-                await _statementProcessor.ProcessAsync(null, files);
+                await _statementProcessor.ProcessAsync(statementMetadata, files);
             }
         }
     }
