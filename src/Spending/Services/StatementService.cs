@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Spending.Api.Models;
-using Spending.Api.Services.Parser;
+using Spending.Api.Services.Extractors;
+using Spending.Api.Services.Parsers;
 using Spending.Models;
 
 namespace Spending.Api.Services
@@ -13,19 +14,19 @@ namespace Spending.Api.Services
     {
         private readonly ILogger<StatementService> _logger;
         private readonly IFormFileService _formFileService;
-        private readonly ITextExtractorService _extractorService;
-        private readonly Func<string, IParserService> _parserServiceResolver;
+        private readonly Func<string, string, IParserService> _parserServiceResolver;
+        private readonly Func<string, ITextExtractorService> _textExtractorResolver;
 
         public StatementService(
             ILogger<StatementService> logger,
             IFormFileService formFileService,
-            ITextExtractorService extractorService,
-            Func<string, IParserService> parserServiceResolver)
+            Func<string, string, IParserService> parserServiceResolver,
+            Func<string, ITextExtractorService> textExtractorResolver)
         {
             _logger = logger;
             _formFileService = formFileService;
-            _extractorService = extractorService;
             _parserServiceResolver = parserServiceResolver;
+            _textExtractorResolver = textExtractorResolver;
         }
 
         private void ConsolidateTransactions(StatementMetadata statementMetadata, IEnumerable<Transaction> transactions)
@@ -37,21 +38,27 @@ namespace Spending.Api.Services
             }
         }
 
-        private IParserService GetParserServiceForBank(int bankId)
+        private IParserService GetParserService(int bankId, string fileType)
         {
             var bankName = Banks.Mapping.ContainsKey(bankId) ? Banks.Mapping[bankId] : null;
 
-            return _parserServiceResolver.Invoke(bankName);
+            return _parserServiceResolver.Invoke(bankName, fileType);
+        }
+
+        private ITextExtractorService GetExtractorServiceForFileType(string fileType)
+        {
+            return _textExtractorResolver.Invoke(fileType);
         }
 
         public async Task ProcessAsync(StatementMetadata statementMetadata, IFormFileCollection files)
         {
-            var parserService = GetParserServiceForBank(statementMetadata.BankId);
+            var parserService = GetParserService(statementMetadata.BankId, statementMetadata.StatementFileType);
+            var extractorService = GetExtractorServiceForFileType(statementMetadata.StatementFileType);
 
             foreach (var file in files)
             {
                 var fileStream = await _formFileService.CopyFileAsync(file);
-                var fileContent = _extractorService.GetContent(fileStream);
+                var fileContent = extractorService.GetContent(fileStream);
                 var transactions = parserService.GetTransactions(fileContent);
 
                 ConsolidateTransactions(statementMetadata, transactions);

@@ -26,6 +26,10 @@
             <option value=@user.Id>@user.Name</option>
         }
     </select>
+    <select @bind="_fileTypeIdSelected">
+        <option value="csv">csv</option>
+        <option value="pdf">pdf</option>
+    </select>
     <InputFile multiple OnChange="HandleFileSelected" />
 </div>
 
@@ -34,6 +38,7 @@
     int _bankIdSelected;
     int _accountIdSelected;
     int _userIdSelected;
+    string _fileTypeIdSelected;
 
     readonly List<Bank> _banks = new List<Bank>()
     {
@@ -91,7 +96,8 @@
                 {
                     BankId = _bankIdSelected,
                     AccountId = _accountIdSelected,
-                    UserId = _userIdSelected
+                    UserId = _userIdSelected,
+                    StatementFileType = _fileTypeIdSelected
                 }), "application/json", "statementMetadata")
             };
 
@@ -100,7 +106,7 @@
                 var ms = new MemoryStream();
                 await file.Data.CopyToAsync(ms);
 
-                content.Add(FormatFileContent(ms.GetBuffer(), "application/pdf", "statementFile", file.Name));  
+                content.Add(FormatFileContent(ms.GetBuffer(), "text/csv", "statementFile", file.Name));  
             }
             var res = Http.PostAsync("https://localhost:5003/api/statement", content);
         }
@@ -116,5 +122,6 @@
         _bankIdSelected = _banks.FirstOrDefault().Id;
         _accountIdSelected = _accounts.FirstOrDefault().Id;
         _userIdSelected = _users.FirstOrDefault().Id;
+        _fileTypeIdSelected = "csv";
     }
 }

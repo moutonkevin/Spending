@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using iText.Kernel.Pdf;
 
-namespace Spending.Api.Services
+namespace Spending.Api.Services.Extractors
 {
     public class TextSharpPdfTextExtractorService : ITextExtractorService
     {

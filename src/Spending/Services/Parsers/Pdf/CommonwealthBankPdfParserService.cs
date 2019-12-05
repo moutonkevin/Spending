@@ -2,38 +2,18 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Spending.Models;
 
-namespace Spending.Api.Services.Parser
+namespace Spending.Api.Services.Parsers
 {
-    public class CommonwealthBankParserService : IParserService
+    public class CommonwealthBankPdfParserService : ParserBaseService, IParserService
     {
-        private string ExtractDataFromTransaction(string content)
-        {
-            var matches = Regex.Match(content, @"\([^)]*\)");
-
-            if (matches.Success)
-            {
-                return matches.Groups[0].Value.Replace("(", "").Replace(")", "");
-            }
-            return null;
-        }
-
         private IList<string> ExtractRawSections(string content)
         {
             return content.Split(new[]
             {
                 "ET\r",
                 "BT\r"
-            }, StringSplitOptions.RemoveEmptyEntries);
-        }
-
-        private IList<string> ExtractRawLines(string section)
-        {
-            return section.Split(new[]
-            {
-                "TJ\r"
             }, StringSplitOptions.RemoveEmptyEntries);
         }
 

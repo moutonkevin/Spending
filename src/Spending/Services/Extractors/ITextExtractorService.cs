@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Spending.Api.Services
+namespace Spending.Api.Services.Extractors
 {
     public interface ITextExtractorService
     {

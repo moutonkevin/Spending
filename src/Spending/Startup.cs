@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
@@ -8,7 +7,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Spending.Api.Services;
-using Spending.Api.Services.Parser;
+using Spending.Api.Services.Extractors;
+using Spending.Api.Services.Parsers;
+using Spending.Api.Services.Parsers.Csv;
 using Spending.Models;
 
 namespace Spending.Api
@@ -27,26 +28,93 @@ namespace Spending.Api
             services.AddControllers();
 
             services.AddScoped<IFormFileService, FormFileService>();
-            services.AddScoped<ITextExtractorService, TextSharpPdfTextExtractorService>();
             services.AddScoped<IStatementService, StatementService>();
-            services.AddScoped<CommonwealthBankParserService>();
-            services.AddScoped<AmexParserService>();
 
-            services.AddScoped<Func<string, IParserService>>(serviceProvider => key =>
+            #region Extractors
+
+            services.AddScoped<TextSharpPdfTextExtractorService>();
+            services.AddScoped<CsvTextExtractorService>();
+
+            services.AddScoped<Func<string, ITextExtractorService>>(serviceProvider => key =>
             {
-                if (key.Equals(Banks.Mapping[1]))
+                if (key.Equals(Constants.Pdf))
                 {
-                    return serviceProvider.GetService<CommonwealthBankParserService>();
+                    return serviceProvider.GetService<TextSharpPdfTextExtractorService>();
                 }
-                else if (key.Equals(Banks.Mapping[2]))
+                else if (key.Equals(Constants.Csv))
                 {
-                    return serviceProvider.GetService<AmexParserService>();
+                    return serviceProvider.GetService<CsvTextExtractorService>();
                 }
                 else
                 {
                     throw new KeyNotFoundException();
                 }
             });
+
+            #endregion
+
+            #region Parsers
+
+            services.AddScoped<CommonwealthBankPdfParserService>();
+            services.AddScoped<CommonwealthBankCsvParserService>();
+            services.AddScoped<AmexPdfParserService>();
+            services.AddScoped<AmexCsvParserService>();
+            services.AddScoped<QantasMoneyCsvParserService>();
+            
+            services.AddScoped<Func<string, string, IParserService>>(serviceProvider => (bankKey, fileTypeKey) =>
+            {
+                if (bankKey.Equals(Banks.Mapping[1]))
+                {
+                    if (fileTypeKey.Equals(Constants.Pdf))
+                    {
+                        return serviceProvider.GetService<CommonwealthBankPdfParserService>();
+                    }
+                    else if (fileTypeKey.Equals(Constants.Csv))
+                    {
+                        return serviceProvider.GetService<CommonwealthBankCsvParserService>();
+                    }
+                    else
+                    {
+                        throw new KeyNotFoundException(fileTypeKey);
+                    }
+                }
+                else if (bankKey.Equals(Banks.Mapping[2]))
+                {
+                    if (fileTypeKey.Equals(Constants.Pdf))
+                    {
+                        return serviceProvider.GetService<AmexPdfParserService>();
+                    }
+                    else if (fileTypeKey.Equals(Constants.Csv))
+                    {
+                        return serviceProvider.GetService<AmexCsvParserService>();
+                    }
+                    else
+                    {
+                        throw new KeyNotFoundException(fileTypeKey);
+                    }
+                }
+                else if (bankKey.Equals(Banks.Mapping[5]))
+                {
+                    if (fileTypeKey.Equals(Constants.Pdf))
+                    {
+                        throw new KeyNotFoundException(fileTypeKey);
+                    }
+                    else if (fileTypeKey.Equals(Constants.Csv))
+                    {
+                        return serviceProvider.GetService<QantasMoneyCsvParserService>();
+                    }
+                    else
+                    {
+                        throw new KeyNotFoundException(fileTypeKey);
+                    }
+                }
+                else
+                {
+                    throw new KeyNotFoundException(bankKey);
+                }
+            });
+
+            #endregion
 
             services.Configure<FormOptions>(options =>
             {
