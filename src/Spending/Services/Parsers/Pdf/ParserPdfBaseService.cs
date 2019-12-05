@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace Spending.Api.Services.Parsers
+namespace Spending.Api.Services.Parsers.Pdf
 {
-    public class ParserBaseService
+    public class ParserPdfBaseService
     {
         protected string ExtractDataFromTransaction(string content)
         {

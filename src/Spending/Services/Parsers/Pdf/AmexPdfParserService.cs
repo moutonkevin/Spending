@@ -2,9 +2,9 @@
 using System.Text.RegularExpressions;
 using Spending.Models;
 
-namespace Spending.Api.Services.Parsers
+namespace Spending.Api.Services.Parsers.Pdf
 {
-    public class AmexPdfParserService : ParserBaseService, IParserService
+    public class AmexPdfParserService : ParserPdfBaseService, IParserService
     {
         private new List<string> ExtractDataFromTransaction(string content)
         {

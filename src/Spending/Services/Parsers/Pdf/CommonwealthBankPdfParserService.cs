@@ -4,9 +4,9 @@ using System.Globalization;
 using System.Linq;
 using Spending.Models;
 
-namespace Spending.Api.Services.Parsers
+namespace Spending.Api.Services.Parsers.Pdf
 {
-    public class CommonwealthBankPdfParserService : ParserBaseService, IParserService
+    public class CommonwealthBankPdfParserService : ParserPdfBaseService, IParserService
     {
         private IList<string> ExtractRawSections(string content)
         {

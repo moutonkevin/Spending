@@ -10,6 +10,7 @@ using Spending.Api.Services;
 using Spending.Api.Services.Extractors;
 using Spending.Api.Services.Parsers;
 using Spending.Api.Services.Parsers.Csv;
+using Spending.Api.Services.Parsers.Pdf;
 using Spending.Models;
 
 namespace Spending.Api
