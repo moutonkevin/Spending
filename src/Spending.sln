@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29424.173
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spending.Api", "Spending\Spending.Api.csproj", "{FA5F6D3A-D111-4F53-B1A7-83CF58A8025F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spending.Models", "Spending.Models\Spending.Models.csproj", "{E4FD3977-DE51-4B92-A2DF-AF6022933E50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spending.Api", "Spending.Api\Spending.Api.csproj", "{FA5F6D3A-D111-4F53-B1A7-83CF58A8025F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spending.Database", "Spending.Database\Spending.Database.csproj", "{DB95A774-65B2-4B06-9F61-9ED51DB388A3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spending.Web", "Spending.Web\Spending.Web.csproj", "{50E2CD8D-4353-4BD7-A686-2E0B2819EBC9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spending.DatabaseMigration", "Spending.DatabaseMigration\Spending.DatabaseMigration.csproj", "{912E5300-613B-4C9D-9D35-250C01AF9F3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +21,6 @@ Global
 		{FA5F6D3A-D111-4F53-B1A7-83CF58A8025F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA5F6D3A-D111-4F53-B1A7-83CF58A8025F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA5F6D3A-D111-4F53-B1A7-83CF58A8025F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E4FD3977-DE51-4B92-A2DF-AF6022933E50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E4FD3977-DE51-4B92-A2DF-AF6022933E50}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E4FD3977-DE51-4B92-A2DF-AF6022933E50}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E4FD3977-DE51-4B92-A2DF-AF6022933E50}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DB95A774-65B2-4B06-9F61-9ED51DB388A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DB95A774-65B2-4B06-9F61-9ED51DB388A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB95A774-65B2-4B06-9F61-9ED51DB388A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,6 +29,10 @@ Global
 		{50E2CD8D-4353-4BD7-A686-2E0B2819EBC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50E2CD8D-4353-4BD7-A686-2E0B2819EBC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50E2CD8D-4353-4BD7-A686-2E0B2819EBC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{912E5300-613B-4C9D-9D35-250C01AF9F3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{912E5300-613B-4C9D-9D35-250C01AF9F3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{912E5300-613B-4C9D-9D35-250C01AF9F3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{912E5300-613B-4C9D-9D35-250C01AF9F3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -11,6 +11,11 @@
     <StartupObject>Spending.Database.Startup</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="NewFolder\**" />
+    <EmbeddedResource Remove="NewFolder\**" />
+    <None Remove="NewFolder\**" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.1">
@@ -22,9 +27,6 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.0.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Spending.Models\Spending.Models.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">

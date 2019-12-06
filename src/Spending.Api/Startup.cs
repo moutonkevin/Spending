@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Spending.Api.DataAccess;
 using Spending.Api.Services;
 using Spending.Api.Services.Extractors;
 using Spending.Api.Services.Parsers;
 using Spending.Api.Services.Parsers.Csv;
 using Spending.Api.Services.Parsers.Pdf;
+using Spending.Database.Context;
 using Spending.Database.Entities;
 
 namespace Spending.Api
@@ -38,7 +41,7 @@ namespace Spending.Api
             ConfigureSystemServices(services);
 
             services.AddScoped<IFormFileService, FormFileService>();
-            services.AddScoped<IStatementService, StatementService>();
+            services.AddScoped<ITransactionService, TransactionService>();
 
             #region Extractors
 
@@ -125,6 +128,12 @@ namespace Spending.Api
             });
 
             #endregion
+
+            services.AddScoped<ITransactionDataAccess, TransactionDatabaseDataAccess>();
+
+            services
+                .AddDbContext<SpendingContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("SpendingDatabase")));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -133,7 +142,7 @@ namespace Spending.Api
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            
             app.UseHttpsRedirection();
 
             app.UseRouting();

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
+using Spending.Database.Entities;
 
 namespace Spending.Api.Services.Parsers.Csv
 {
@@ -19,7 +21,10 @@ namespace Spending.Api.Services.Parsers.Csv
 
         protected string Sanitize(string content)
         {
-            return content.Replace("\"", "").Trim();
+            content = Regex.Replace(content, @"\s+", " ");
+            content = content.Replace("\"", "").Trim();
+
+            return content;
         }
 
         protected decimal ParseAmount(string amount)
@@ -35,6 +40,11 @@ namespace Spending.Api.Services.Parsers.Csv
         protected IEnumerable<string> RemoveHeader(IEnumerable<string> transactions)
         {
             return transactions.Skip(1);
+        }
+
+        protected TransactionTypeEnum GetTransactionTypeEnum(decimal amount, string description)
+        {
+            return amount > 0 ? TransactionTypeEnum.Credit : TransactionTypeEnum.Debit;
         }
     }
 }

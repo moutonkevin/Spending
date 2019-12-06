@@ -9,7 +9,9 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Spending.Models\Spending.Models.csproj" />
     <ProjectReference Include="..\Spending\Spending.Api.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\" />
   </ItemGroup>
 </Project>

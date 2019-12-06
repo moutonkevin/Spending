@@ -1,22 +1,29 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Spending.Database.Context;
 
-namespace Spending.Database
+namespace Spending.DatabaseMigration.Context
 {
-    public class Startup
+    public class SpendingContextMigration : SpendingContext
     {
-        public static void Main(string[] args)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables();
-            
+
             //builder.AddUserSecrets<Startup>();
 
             var configuration = builder.Build();
 
             var spendingDatabaseConnectionString = configuration["ConnectionStrings:SpendingDatabase"];
+
+            Console.WriteLine(spendingDatabaseConnectionString);
+
+            optionsBuilder.UseSqlServer(spendingDatabaseConnectionString);
         }
     }
 }

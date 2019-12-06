@@ -26,7 +26,7 @@ namespace Spending.Api.Services.Parsers.Csv
                     {
                         Date = DateTime.ParseExact(date, "dd/MM/yyyy", CultureInfo.InvariantCulture),
                         Amount = decimal.Parse(amount, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint),
-                        Description = description
+                        Description = description,
                     });
                 }
                 catch (Exception e)

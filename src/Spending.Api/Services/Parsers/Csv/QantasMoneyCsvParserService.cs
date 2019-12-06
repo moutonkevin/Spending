@@ -19,15 +19,17 @@ namespace Spending.Api.Services.Parsers.Csv
 
                 try
                 {
-                    var date = Sanitize(columns[0]);
+                    var date = ParseDate(Sanitize(columns[0]), "yyyy-MM-dd");
                     var description = Sanitize(columns[1]);
-                    var amount = Sanitize(columns[2]);
+                    var amount = ParseAmount(Sanitize(columns[2]));
+                    var transactionType = (int)GetTransactionTypeEnum(amount, description);
 
                     transactions.Add(new Transaction
                     {
-                        Date = ParseDate(date, "yyyy-MM-dd"),
-                        Amount = ParseAmount(amount),
-                        Description = description
+                        Date = date,
+                        Amount = amount,
+                        Description = description,
+                        TransactionTypeId = transactionType
                     });
                 }
                 catch (Exception _)

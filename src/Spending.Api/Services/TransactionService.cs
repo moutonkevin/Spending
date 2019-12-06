@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Spending.Api.DataAccess;
 using Spending.Api.Models;
 using Spending.Api.Services.Extractors;
 using Spending.Api.Services.Parsers;
@@ -10,23 +11,26 @@ using Spending.Database.Entities;
 
 namespace Spending.Api.Services
 {
-    public class StatementService : IStatementService
+    public class TransactionService : ITransactionService
     {
-        private readonly ILogger<StatementService> _logger;
+        private readonly ILogger<TransactionService> _logger;
         private readonly IFormFileService _formFileService;
         private readonly Func<string, string, IParserService> _parserServiceResolver;
         private readonly Func<string, ITextExtractorService> _textExtractorResolver;
+        private readonly ITransactionDataAccess _transactionDataAccess;
 
-        public StatementService(
-            ILogger<StatementService> logger,
+        public TransactionService(
+            ILogger<TransactionService> logger,
             IFormFileService formFileService,
             Func<string, string, IParserService> parserServiceResolver,
-            Func<string, ITextExtractorService> textExtractorResolver)
+            Func<string, ITextExtractorService> textExtractorResolver,
+            ITransactionDataAccess transactionDataAccess)
         {
             _logger = logger;
             _formFileService = formFileService;
             _parserServiceResolver = parserServiceResolver;
             _textExtractorResolver = textExtractorResolver;
+            _transactionDataAccess = transactionDataAccess;
         }
 
         private IParserService GetParserService(int bankId, string fileType)
@@ -50,7 +54,7 @@ namespace Spending.Api.Services
             }
         }
 
-        public async Task ProcessAsync(StatementMetadata statementMetadata, IFormFileCollection files)
+        public async Task SaveAsync(StatementMetadata statementMetadata, IFormFileCollection files)
         {
             var parserService = GetParserService(statementMetadata.BankId, statementMetadata.StatementFileType);
             var extractorService = GetExtractorServiceForFileType(statementMetadata.StatementFileType);
@@ -62,6 +66,8 @@ namespace Spending.Api.Services
                 var transactions = parserService.GetTransactions(fileContent);
 
                 ConsolidateTransactions(statementMetadata, transactions);
+
+                await _transactionDataAccess.SaveAsync(transactions);
             }
         }
     }

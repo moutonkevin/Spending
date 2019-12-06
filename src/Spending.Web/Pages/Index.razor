@@ -1,7 +1,6 @@
 ﻿@page "/"
 @using System.IO
 @using System.Net.Http.Headers
-@using Microsoft.AspNetCore.Components
 @inject HttpClient Http
 @using Newtonsoft.Json
 @using Spending.Api.Models
@@ -83,8 +82,6 @@
 
         return file;
     }
-
-
 
     async Task HandleFileSelected(IFileListEntry[] files)
     {

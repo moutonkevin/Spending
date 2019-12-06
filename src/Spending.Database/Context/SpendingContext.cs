@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Spending.Database.Entities;
@@ -16,21 +17,32 @@ namespace Spending.Database.Context
         public DbSet<TransactionCategory> TransactionCategory { get; set; }
         public DbSet<TransactionDescriptionUserCategory> TransactionDescriptionUserCategory { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public SpendingContext()
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables();
-
-            builder.AddUserSecrets<Startup>();
-
-            var configuration = builder.Build();
-
-            var spendingDatabaseConnectionString = configuration["ConnectionStrings:SpendingDatabase"];
-
-            optionsBuilder.UseSqlServer(spendingDatabaseConnectionString);
         }
+
+        public SpendingContext(DbContextOptions<SpendingContext> options)
+            : base(options)
+        {
+        }
+
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    var builder = new ConfigurationBuilder()
+        //        .SetBasePath(Directory.GetCurrentDirectory())
+        //        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+        //        .AddEnvironmentVariables();
+
+        //    //builder.AddUserSecrets<Startup>();
+
+        //    var configuration = builder.Build();
+
+        //    var spendingDatabaseConnectionString = configuration["ConnectionStrings:SpendingDatabase"];
+
+        //    Console.WriteLine(spendingDatabaseConnectionString);
+
+        //    optionsBuilder.UseSqlServer(spendingDatabaseConnectionString);
+        //}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -56,7 +68,7 @@ namespace Spending.Database.Context
                     new Account { Id = 7, Name = "Qantas Credit Card", BankId = 5 }
                 );
 
-                    modelBuilder
+            modelBuilder
                 .Entity<Category>()
                 .HasData(
                     new Category { Id = 1, Name = "Rent" },
@@ -88,6 +100,11 @@ namespace Spending.Database.Context
                     new User { Id = 1, Name = "Kevin" },
                     new User { Id = 2, Name = "Mika" }
                 );
+
+            modelBuilder
+                .Entity<Transaction>()
+                .Property(s => s.Amount)
+                .HasColumnType("decimal(19, 2)");
         }
     }
 }

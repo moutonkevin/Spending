@@ -18,7 +18,7 @@ dotnet user-secrets init
 
 ## Add secret
 
-dotnet user-secrets set "ConnectionStrings:SpendingDatabase" "..."
+dotnet user-secrets set "ConnectionStrings:SpendingDatabase" "Data Source=localhost\SQLEXPRESS01;Database=spending-db;Trusted_Connection=True;"
 
 ## See secrets
 

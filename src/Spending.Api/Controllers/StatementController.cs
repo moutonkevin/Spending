@@ -1,6 +1,4 @@
-﻿using System.Buffers;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -15,14 +13,14 @@ namespace Spending.Api.Controllers
     public class StatementController : ControllerBase
     {
         private readonly ILogger<StatementController> _logger;
-        private readonly IStatementService _statementProcessor;
+        private readonly ITransactionService _transactionService;
 
         public StatementController(
             ILogger<StatementController> logger,
-            IStatementService statementProcessor)
+            ITransactionService transactionService)
         {
             _logger = logger;
-            _statementProcessor = statementProcessor;
+            _transactionService = transactionService;
         }
 
         [HttpPost]
@@ -37,7 +35,7 @@ namespace Spending.Api.Controllers
                     .Select(s => s.Value)
                     .ToList()[0]);
 
-                await _statementProcessor.ProcessAsync(statementMetadata, files);
+                await _transactionService.SaveAsync(statementMetadata, files);
             }
         }
     }

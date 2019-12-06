@@ -4,8 +4,8 @@ using Spending.Api.Models;
 
 namespace Spending.Api.Services
 {
-    public interface IStatementService
+    public interface ITransactionService
     {
-        Task ProcessAsync(StatementMetadata statementMetadata, IFormFileCollection files);
+        Task SaveAsync(StatementMetadata statementMetadata, IFormFileCollection files);
     }
 }
