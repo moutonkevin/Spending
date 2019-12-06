@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace Spending.Api.Services.Parsers.Csv
 {
@@ -29,6 +30,11 @@ namespace Spending.Api.Services.Parsers.Csv
         protected DateTime ParseDate(string date, string format)
         {
             return DateTime.ParseExact(date, format, CultureInfo.InvariantCulture);
+        }
+
+        protected IEnumerable<string> RemoveHeader(IEnumerable<string> transactions)
+        {
+            return transactions.Skip(1);
         }
     }
 }

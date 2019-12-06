@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Spending.Api.Models;
 using Spending.Api.Services.Extractors;
 using Spending.Api.Services.Parsers;
-using Spending.Models;
+using Spending.Database.Entities;
 
 namespace Spending.Api.Services
 {
@@ -29,15 +29,6 @@ namespace Spending.Api.Services
             _textExtractorResolver = textExtractorResolver;
         }
 
-        private void ConsolidateTransactions(StatementMetadata statementMetadata, IEnumerable<Transaction> transactions)
-        {
-            foreach (var transaction in transactions)
-            {
-                transaction.AccountId = statementMetadata.AccountId;
-                transaction.UserId = statementMetadata.UserId;
-            }
-        }
-
         private IParserService GetParserService(int bankId, string fileType)
         {
             var bankName = Banks.Mapping.ContainsKey(bankId) ? Banks.Mapping[bankId] : null;
@@ -48,6 +39,15 @@ namespace Spending.Api.Services
         private ITextExtractorService GetExtractorServiceForFileType(string fileType)
         {
             return _textExtractorResolver.Invoke(fileType);
+        }
+
+        private void ConsolidateTransactions(StatementMetadata statementMetadata, IEnumerable<Transaction> transactions)
+        {
+            foreach (var transaction in transactions)
+            {
+                transaction.AccountId = statementMetadata.AccountId;
+                transaction.UserId = statementMetadata.UserId;
+            }
         }
 
         public async Task ProcessAsync(StatementMetadata statementMetadata, IFormFileCollection files)

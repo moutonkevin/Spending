@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Spending.Models;
+using Spending.Database.Entities;
 
 namespace Spending.Api.Services.Parsers.Pdf
 {

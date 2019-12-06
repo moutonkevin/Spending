@@ -1,4 +1,4 @@
-﻿namespace Spending.Models
+﻿namespace Spending.Database.Entities
 {
     public enum TransactionTypeEnum
     {

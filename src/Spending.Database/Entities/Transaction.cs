@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Spending.Models
+namespace Spending.Database.Entities
 {
     public class Transaction
     {

@@ -1,11 +1,11 @@
 ﻿using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Spending.Models;
+using Spending.Database.Entities;
 
-namespace Spending.Migration
+namespace Spending.Database.Context
 {
-    public class MigrationContext : DbContext
+    public class SpendingContext : DbContext
     {
         public DbSet<Bank> Bank { get; set; }
         public DbSet<Account> Account { get; set; }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Spending.Models;
+using Spending.Database.Entities;
 
 namespace Spending.Api.Services.Parsers.Csv
 {

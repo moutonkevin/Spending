@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Spending.Models;
+using Spending.Database.Entities;
 
 namespace Spending.Api.Services.Parsers
 {

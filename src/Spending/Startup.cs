@@ -11,7 +11,7 @@ using Spending.Api.Services.Extractors;
 using Spending.Api.Services.Parsers;
 using Spending.Api.Services.Parsers.Csv;
 using Spending.Api.Services.Parsers.Pdf;
-using Spending.Models;
+using Spending.Database.Entities;
 
 namespace Spending.Api
 {
@@ -24,9 +24,18 @@ namespace Spending.Api
 
         public IConfiguration Configuration { get; }
 
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureSystemServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = int.MaxValue;
+            });
+        }
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+            ConfigureSystemServices(services);
 
             services.AddScoped<IFormFileService, FormFileService>();
             services.AddScoped<IStatementService, StatementService>();
@@ -116,14 +125,8 @@ namespace Spending.Api
             });
 
             #endregion
-
-            services.Configure<FormOptions>(options =>
-            {
-                options.MultipartBodyLengthLimit = int.MaxValue; //not recommended value
-            });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

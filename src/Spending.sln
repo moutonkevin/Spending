@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spending.Api", "Spending\Sp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spending.Models", "Spending.Models\Spending.Models.csproj", "{E4FD3977-DE51-4B92-A2DF-AF6022933E50}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spending.Migration", "Spending.Migration\Spending.Migration.csproj", "{DB95A774-65B2-4B06-9F61-9ED51DB388A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spending.Database", "Spending.Database\Spending.Database.csproj", "{DB95A774-65B2-4B06-9F61-9ED51DB388A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spending.Web", "Spending.Web\Spending.Web.csproj", "{50E2CD8D-4353-4BD7-A686-2E0B2819EBC9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spending.Web", "Spending.Web\Spending.Web.csproj", "{50E2CD8D-4353-4BD7-A686-2E0B2819EBC9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

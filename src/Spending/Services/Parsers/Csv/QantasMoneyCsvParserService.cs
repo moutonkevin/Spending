@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Spending.Models;
+using Spending.Database.Entities;
 
 namespace Spending.Api.Services.Parsers.Csv
 {
@@ -13,7 +13,7 @@ namespace Spending.Api.Services.Parsers.Csv
             var transactions = new List<Transaction>();
 
             //skip header
-            foreach (var line in lines.Skip(1))
+            foreach (var line in RemoveHeader(lines))
             {
                 var columns = GetIndividualTransactionColumns(line, ",").ToList();
 

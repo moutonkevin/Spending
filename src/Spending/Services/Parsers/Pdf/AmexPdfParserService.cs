@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Spending.Models;
+using Spending.Database.Entities;
 
 namespace Spending.Api.Services.Parsers.Pdf
 {

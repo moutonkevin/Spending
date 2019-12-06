@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Microsoft.Extensions.Configuration;
 
-namespace Spending.Migration
+namespace Spending.Database
 {
     public class Startup
     {
