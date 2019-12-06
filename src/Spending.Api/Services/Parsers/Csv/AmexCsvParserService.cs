@@ -1,35 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Linq;
 using Spending.Database.Entities;
 
 namespace Spending.Api.Services.Parsers.Csv
 {
-    public class AmexCsvParserService : IParserService
+    public class AmexCsvParserService : ParserCsvBaseService, IParserService
     {
         public IList<Transaction> GetTransactions(string content)
         {
-            var lines = content.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            var lines = GetIndividualTransactions(content, Environment.NewLine);
             var transactions = new List<Transaction>();
 
             foreach (var line in lines)
             {
-                var columns = line.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                var columns = GetIndividualTransactionColumns(line, ",").ToList();
 
                 try
                 {
-                    var date = columns[0].Trim();
-                    var amount = columns[1].Replace("\"", "").Trim();
-                    var description = columns[2].Replace("\"", "").Trim();
+                    var date = ParseDate(Sanitize(columns[0]), "dd/MM/yyyy");
+                    var amount = ParseAmount(Sanitize(columns[1]));
+                    var description = Sanitize(columns[2]);
+                    var transactionType = (int)GetTransactionTypeEnum(amount, description);
 
                     transactions.Add(new Transaction
                     {
-                        Date = DateTime.ParseExact(date, "dd/MM/yyyy", CultureInfo.InvariantCulture),
-                        Amount = decimal.Parse(amount, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint),
-                        Description = description
+                        Date = date,
+                        Amount = amount,
+                        Description = description,
+                        TransactionTypeId = transactionType
                     });
                 }
-                catch (Exception _)
+                catch (Exception exception)
                 {
                     Console.WriteLine($"Transaction could not be parsed: {line}");
                 }

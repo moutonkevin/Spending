@@ -18,16 +18,20 @@ namespace Spending.Api.DataAccess
             _spendingContext = spendingContext;
         }
 
-        public async Task SaveAsync(IEnumerable<Transaction> transactions)
+        public async Task<bool> SaveAsync(IEnumerable<Transaction> transactions)
         {
             try
             {
                 await _spendingContext.Transaction.AddRangeAsync(transactions);
                 await _spendingContext.SaveChangesAsync();
+
+                return true;
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                _logger.LogError(e, "Could not save transactions into DB");
+                _logger.LogError(exception, "Could not save transactions into DB");
+                
+                return false;
             }
         }
     }

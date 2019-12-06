@@ -6,6 +6,6 @@ namespace Spending.Api.DataAccess
 {
     public interface ITransactionDataAccess
     {
-        Task SaveAsync(IEnumerable<Transaction> transactions);
+        Task<bool> SaveAsync(IEnumerable<Transaction> transactions);
     }
 }
