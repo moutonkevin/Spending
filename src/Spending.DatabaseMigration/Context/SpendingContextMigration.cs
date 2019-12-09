@@ -88,6 +88,24 @@ namespace Spending.DatabaseMigration.Context
                 .Entity<Transaction>()
                 .Property(s => s.Amount)
                 .HasColumnType("decimal(19, 2)");
+
+            modelBuilder
+                .Entity<Transaction>()
+                .HasIndex(transaction => new
+                {
+                    transaction.Amount,
+                    transaction.TransactionTypeId, 
+                    transaction.Date,
+                    transaction.Description,
+                    transaction.UserId
+                }).IsUnique();
+
+            //modelBuilder
+            //    .Entity<Transaction>()
+            //    .HasData(
+            //        new Transaction {Id = 1, Amount = 10, Date = new DateTime(2019, 11, 01).ToShortDateString(), TransactionTypeId = 1, Description = "hello", AccountId = 1, UserId = 1 },
+            //        new Transaction {Id = 2, Amount = 10, Date = new DateTime(2019, 11, 01).ToShortDateString(), TransactionTypeId = 1, Description = "hello", AccountId = 1, UserId = 2 }
+            //    );
         }
     }
 }

@@ -52,7 +52,7 @@ namespace Spending.Api.Services.Parsers.Pdf
 
                 if (DateTime.TryParseExact(unfilteredTransaction[0], "dd MMM", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
                 {
-                    transaction.Date = new DateTime(DateTime.Now.Year, date.Month, date.Day);
+                    transaction.Date = new DateTime(DateTime.Now.Year, date.Month, date.Day).ToShortDateString();
                     unfilteredTransaction.Remove(unfilteredTransaction[0]);
                 }
 

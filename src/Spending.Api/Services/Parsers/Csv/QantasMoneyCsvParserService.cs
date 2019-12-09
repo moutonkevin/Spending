@@ -19,7 +19,7 @@ namespace Spending.Api.Services.Parsers.Csv
 
                 try
                 {
-                    var date = ParseDate(Sanitize(columns[0]), "yyyy-MM-dd");
+                    var date = ParseDate(Sanitize(columns[0]), "yyyy-MM-dd").ToShortDateString();
                     var description = Sanitize(columns[1]);
                     var amount = ParseAmount(Sanitize(columns[2]));
                     var transactionType = (int)GetTransactionTypeEnum(amount, description);
