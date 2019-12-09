@@ -24,7 +24,7 @@ namespace Spending.Api.Controllers
         }
 
         [HttpPost]
-        public async Task ProcessDocuments()
+        public async Task<IActionResult> ProcessDocuments()
         {
             if (HttpContext.Request.Form.Files.Any())
             {
@@ -34,9 +34,12 @@ namespace Spending.Api.Controllers
                     .Where(form => form.Key.Equals("statementMetadata"))
                     .Select(s => s.Value)
                     .ToList()[0]);
+                
+                var transactions = await _transactionService.SaveAsync(statementMetadata, files);
 
-                await _transactionService.SaveAsync(statementMetadata, files);
+                return Ok(transactions);
             }
+            return null;
         }
     }
 }

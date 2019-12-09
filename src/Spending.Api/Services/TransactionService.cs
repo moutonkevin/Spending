@@ -54,10 +54,12 @@ namespace Spending.Api.Services
             }
         }
 
-        public async Task SaveAsync(StatementMetadata statementMetadata, IFormFileCollection files)
+        public async Task<IEnumerable<Transaction>> SaveAsync(StatementMetadata statementMetadata, IFormFileCollection files)
         {
             var parserService = GetParserService(statementMetadata.BankId, statementMetadata.StatementFileType);
             var extractorService = GetExtractorServiceForFileType(statementMetadata.StatementFileType);
+
+            var combinedTransactions = new List<Transaction>();
 
             foreach (var file in files)
             {
@@ -67,8 +69,12 @@ namespace Spending.Api.Services
 
                 ConsolidateTransactions(statementMetadata, transactions);
 
-                await _transactionDataAccess.SaveAsync(transactions);
+                //await _transactionDataAccess.SaveAsync(transactions);
+
+                combinedTransactions.AddRange(transactions);
             }
+
+            return combinedTransactions;
         }
     }
 }

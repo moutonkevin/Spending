@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using System.IO
 @using System.Net.Http.Headers
+@using Microsoft.Extensions.WebEncoders.Testing
 @inject HttpClient Http
 @using Newtonsoft.Json
 @using Spending.Api.Models
@@ -32,12 +33,52 @@
     <InputFile multiple OnChange="HandleFileSelected" />
 </div>
 
+@if (_transactions != null)
+{
+    <div>
+        <table style="width:100%">
+            <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>User</th>
+                <th>Category</th>
+            </tr>
+            @foreach (var transaction in _transactions)
+            {
+                <tr>
+                    <td>@transaction.Date</td>
+                    <td>@transaction.Amount</td>
+                    <td>@transaction.TransactionTypeId</td>
+                    <td>@transaction.Description</td>
+                    <td>@transaction.UserId</td>
+                    <td>
+                        <select id="@("select"+rand.Next())" @bind="_categorySelected">
+                            @foreach (var category in _categories)
+                            {
+                                <option value=@category.Id>@category.Name</option>
+                            }
+                        </select>
+                        <input type="text" id="@("input"+rand.Next())" @bind="@_descriptionContent">
+                        <button type="button" id="@("button"+rand.Next())" @onclick="@(e => SaveTransactionCategory(@transaction))">Save</button>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+}
+
 @code {
 
     int _bankIdSelected;
     int _accountIdSelected;
     int _userIdSelected;
     string _fileTypeIdSelected;
+    IList<Transaction> _transactions;
+    int _categorySelected;
+    string _descriptionContent;
+    Random rand = new Random();
 
     readonly List<Bank> _banks = new List<Bank>()
     {
@@ -53,9 +94,27 @@
         new Account { Id = 1, Name = "Smart Access", BankId = 1}
     };
 
+
     readonly List<User> _users = new List<User>()
     {
         new User { Id = 1, Name = "Kevin" }
+    };
+
+    readonly List<Category> _categories = new List<Category>()
+    {
+        new Category { Id = 1, Name = "Rent" },
+        new Category { Id = 2, Name = "Groceries" },
+        new Category { Id = 3, Name = "Health Insurance" },
+        new Category { Id = 4, Name = "Mobile Phone" },
+        new Category { Id = 5, Name = "Electricity" },
+        new Category { Id = 6, Name = "Gas" },
+        new Category { Id = 7, Name = "Entertainment" },
+        new Category { Id = 8, Name = "Internet" },
+        new Category { Id = 9, Name = "Shopping" },
+        new Category { Id = 10, Name = "Holiday" },
+        new Category { Id = 11, Name = "Gym" },
+        new Category { Id = 12, Name = "Transfer Between Accounts" },
+        new Category { Id = 13, Name = "Salary" }
     };
 
     HttpContent FormatFileContent(byte[] stream, string contentType, string contentDispositionName, string fileName)
@@ -103,9 +162,11 @@
                 var ms = new MemoryStream();
                 await file.Data.CopyToAsync(ms);
 
-                content.Add(FormatFileContent(ms.GetBuffer(), "text/csv", "statementFile", file.Name));  
+                content.Add(FormatFileContent(ms.GetBuffer(), "text/csv", "statementFile", file.Name));
             }
-            var res = Http.PostAsync("https://localhost:5003/api/statement", content);
+            var response = await Http.PostAsync("https://localhost:5003/api/statement", content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            _transactions = JsonConvert.DeserializeObject<IList<Transaction>>(responseContent).OrderBy(t => t.Description).ToList();
         }
         catch (Exception e)
         {
@@ -120,5 +181,25 @@
         _accountIdSelected = _accounts.FirstOrDefault().Id;
         _userIdSelected = _users.FirstOrDefault().Id;
         _fileTypeIdSelected = "csv";
+        _descriptionContent = "";
     }
+
+    async Task SaveTransactionCategory(Transaction transaction)
+    {
+        var content = new StringContent(JsonConvert.SerializeObject(transaction));
+        var response = await Http.PostAsync
+            ($"https://localhost:5003/api/transactioncategory?" +
+             $"categoryId={_categorySelected}&userId={_userIdSelected}&descriptionContent={_descriptionContent}",
+                content);
+    }
+
+    private void Test()
+    {
+    }
+
+    private void Test2()
+    {
+        throw new NotImplementedException();
+    }
+
 }

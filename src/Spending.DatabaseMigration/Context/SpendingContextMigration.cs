@@ -60,7 +60,7 @@ namespace Spending.DatabaseMigration.Context
                     new Category { Id = 4, Name = "Mobile Phone" },
                     new Category { Id = 5, Name = "Electricity" },
                     new Category { Id = 6, Name = "Gas" },
-                    new Category { Id = 7, Name = "Netflix" },
+                    new Category { Id = 7, Name = "Entertainment" },
                     new Category { Id = 8, Name = "Internet" },
                     new Category { Id = 9, Name = "Shopping" },
                     new Category { Id = 10, Name = "Holiday" },
@@ -101,10 +101,28 @@ namespace Spending.DatabaseMigration.Context
                 }).IsUnique();
 
             //modelBuilder
-            //    .Entity<Transaction>()
+            //    .Entity<TransactionDescriptionUserCategory>()
             //    .HasData(
-            //        new Transaction {Id = 1, Amount = 10, Date = new DateTime(2019, 11, 01).ToShortDateString(), TransactionTypeId = 1, Description = "hello", AccountId = 1, UserId = 1 },
-            //        new Transaction {Id = 2, Amount = 10, Date = new DateTime(2019, 11, 01).ToShortDateString(), TransactionTypeId = 1, Description = "hello", AccountId = 1, UserId = 2 }
+            //#region Rent
+            //        new TransactionDescriptionUserCategory { Id = 1, UserId = 1, CategoryId = 1, Description = "Peterbus Rent" },
+            //        new TransactionDescriptionUserCategory { Id = 2, UserId = 1, CategoryId = 1, Description = "EXCLUSIVE RESIDE 343499 RENT" },
+            //        new TransactionDescriptionUserCategory { Id = 3, UserId = 1, CategoryId = 1, Description = "MIKAEL BESSE NetBank rent and insurance" },
+            //#endregion
+            //#region Groceries
+            //        new TransactionDescriptionUserCategory { Id = 1, UserId = 1, CategoryId = 2, Description = "COLES " },
+            //        new TransactionDescriptionUserCategory { Id = 1, UserId = 1, CategoryId = 2, Description = "MIRACLE SUPERMARKETS" },
+            //        new TransactionDescriptionUserCategory { Id = 1, UserId = 1, CategoryId = 2, Description = "WW TOWN HALL" },
+            //#endregion
+            //#region Health insurance
+            //    new TransactionDescriptionUserCategory { Id = 1, UserId = 1, CategoryId = 3, Description = "NIB HEALTH FUNDS" },
+            //    new TransactionDescriptionUserCategory { Id = 1, UserId = 1, CategoryId = 3, Description = "MIKAEL BESSE NetBank rent and insurance" },
+            //#endregion
+            //#region Phone
+            //    new TransactionDescriptionUserCategory { Id = 1, UserId = 1, CategoryId = 4, Description = "OPTUS BILLING" },
+            //#endregion
+            //#region Entertainment
+            //    new TransactionDescriptionUserCategory { Id = 1, UserId = 1, CategoryId = 3, Description = "OPTUS BILLING" }
+            //#endregion
             //    );
         }
     }

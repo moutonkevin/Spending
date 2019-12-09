@@ -42,6 +42,7 @@ namespace Spending.Api
 
             services.AddScoped<IFormFileService, FormFileService>();
             services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<ITransactionCategoryService, TransactionCategoryService>();
 
             #region Extractors
 
@@ -130,6 +131,7 @@ namespace Spending.Api
             #endregion
 
             services.AddScoped<ITransactionDataAccess, TransactionDatabaseDataAccess>();
+            services.AddScoped<ITransactionCategoryDatabaseDataAccess, TransactionCategoryDatabaseDataAccess>();
 
             services
                 .AddDbContext<SpendingContext>(options =>
