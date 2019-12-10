@@ -5,6 +5,6 @@ namespace Spending.Api.DataAccess
 {
     public interface ITransactionCategoryDatabaseDataAccess
     {
-        Task SaveTransactionCategory(Transaction transaction, string descriptionContent, int categoryId, int userId);
+        Task<bool> SaveTransactionCategory(Transaction transaction, string descriptionContent, int categoryId, int userId);
     }
 }

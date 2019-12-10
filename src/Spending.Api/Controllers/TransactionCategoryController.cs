@@ -17,9 +17,14 @@ namespace Spending.Api.Controllers
         }
 
         [HttpPost]
-        public async Task CategorizeTransaction([FromBody]Transaction transaction, string descriptionContent, int categoryId, int userId)
+        public async Task<IActionResult> CategorizeTransaction([FromBody]Transaction transaction, string descriptionContent, int categoryId, int userId)
         {
-            await _transactionCategoryService.CategorizeAndSaveTransactionAsync(transaction, descriptionContent, categoryId, userId);
+            var isSuccess = await _transactionCategoryService.CategorizeAndSaveTransactionAsync(transaction, descriptionContent, categoryId, userId);
+
+            return Ok(new
+            {
+                IsSuccess = isSuccess
+            });
         }
     }
 }

@@ -5,6 +5,6 @@ namespace Spending.Api.Services
 {
     public interface ITransactionCategoryService
     {
-        Task CategorizeAndSaveTransactionAsync(Transaction transaction, string descriptionContent, int categoryId, int userId);
+        Task<bool> CategorizeAndSaveTransactionAsync(Transaction transaction, string descriptionContent, int categoryId, int userId);
     }
 }

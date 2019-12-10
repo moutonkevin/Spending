@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -54,6 +55,31 @@ namespace Spending.Api.Services
             }
         }
 
+        private void GroupSimilarTransactions(IList<Transaction> transactions)
+        {
+            var groupedTransactions = transactions.GroupBy(x => new {x.Amount, x.TransactionTypeId, x.Date, x.Description, x.UserId}).ToList();
+            var similarTransactionsGrouped = groupedTransactions.Where(groupedTransaction => groupedTransaction.Count() > 1).ToList();
+            var similarTransactionsMerged = similarTransactionsGrouped.Select(s => new Transaction
+            {
+                Description = s.FirstOrDefault().Description,
+                Date = s.FirstOrDefault().Date,
+                AccountId = s.FirstOrDefault().AccountId,
+                UserId = s.FirstOrDefault().UserId,
+                TransactionTypeId = s.FirstOrDefault().TransactionTypeId,
+                Amount = s.Sum(ss => ss.Amount)
+            }).ToList();
+
+            //remove the duplicated
+            var transactionsToRemove = similarTransactionsGrouped.SelectMany(s => s.ToList()).ToList();
+            foreach (var transactionToRemove in transactionsToRemove)
+            {
+                var res = transactions.Remove(transactionToRemove);
+            }
+
+            //add the grouped ones
+            similarTransactionsMerged.ForEach(transactions.Add);
+        }
+
         public async Task<IEnumerable<Transaction>> SaveAsync(StatementMetadata statementMetadata, IFormFileCollection files)
         {
             var parserService = GetParserService(statementMetadata.BankId, statementMetadata.StatementFileType);
@@ -68,13 +94,19 @@ namespace Spending.Api.Services
                 var transactions = parserService.GetTransactions(fileContent);
 
                 ConsolidateTransactions(statementMetadata, transactions);
+                GroupSimilarTransactions(transactions);
 
-                //await _transactionDataAccess.SaveAsync(transactions);
+                await _transactionDataAccess.SaveAsync(transactions);
 
                 combinedTransactions.AddRange(transactions);
             }
 
             return combinedTransactions;
+        }
+
+        public async Task<IEnumerable<Transaction>> GetTransactionsWithoutCategory(int userId)
+        {
+            return null;
         }
     }
 }

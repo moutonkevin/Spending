@@ -17,7 +17,7 @@ namespace Spending.Api.DataAccess
             _spendingContext = spendingContext;
         }
 
-        public async Task SaveTransactionCategory(Transaction transaction, string descriptionContent, int categoryId, int userId)
+        public async Task<bool> SaveTransactionCategory(Transaction transaction, string descriptionContent, int categoryId, int userId)
         {
             try
             {
@@ -27,10 +27,13 @@ namespace Spending.Api.DataAccess
                     CategoryId = categoryId,
                     UserId = userId
                 });
+                await _spendingContext.SaveChangesAsync();
+                return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                return false;
             }
         }
     }

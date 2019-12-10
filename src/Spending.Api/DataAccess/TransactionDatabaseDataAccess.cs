@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Spending.Database.Context;
 using Spending.Database.Entities;
@@ -22,8 +24,15 @@ namespace Spending.Api.DataAccess
         {
             try
             {
-                await _spendingContext.Transaction.AddRangeAsync(transactions);
-                await _spendingContext.SaveChangesAsync();
+                for (int i = 0, batchSize = 100; i < transactions.Count(); i+= batchSize)
+                {
+                    await _spendingContext.UpsertRange(transactions.Skip(i).Take(batchSize))
+                        .On(v => new { v.Amount, v.Description, v.Date, v.TransactionTypeId, v.UserId })
+                        .NoUpdate()
+                        .RunAsync();
+
+                    await _spendingContext.SaveChangesAsync();
+                }
 
                 return true;
             }
@@ -33,6 +42,11 @@ namespace Spending.Api.DataAccess
                 
                 return false;
             }
+        }
+
+        public async Task<IEnumerable<Transaction>> GetTransactionsWithoutCategoryAsync(int userId)
+        {
+            return null;
         }
     }
 }

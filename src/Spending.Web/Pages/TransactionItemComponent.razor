@@ -29,6 +29,8 @@
     [Parameter]
     public int UserId { get; set; }
 
+    [Parameter] public EventCallback<Transaction> RemoveTransaction { get; set; }
+
     Random rand = new Random();
     int _categorySelected;
     string _descriptionContent;
@@ -57,5 +59,13 @@
         var response = await Http.PostAsync(
             $"{apiRootUrl}/transactioncategory?categoryId={_categorySelected}&userId={UserId}&descriptionContent={_descriptionContent}",
             content);
+
+        var res = await response.Content.ReadAsStringAsync();
+        var isSuccess = JsonConvert.DeserializeAnonymousType(res, new {IsSuccess = true});
+
+        if (isSuccess.IsSuccess)
+        {
+            await RemoveTransaction.InvokeAsync(Transaction);
+        }
     }
 }

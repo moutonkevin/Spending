@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spending.Database", "Spendi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spending.Web", "Spending.Web\Spending.Web.csproj", "{50E2CD8D-4353-4BD7-A686-2E0B2819EBC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spending.DatabaseMigration", "Spending.DatabaseMigration\Spending.DatabaseMigration.csproj", "{912E5300-613B-4C9D-9D35-250C01AF9F3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spending.DatabaseMigration", "Spending.DatabaseMigration\Spending.DatabaseMigration.csproj", "{912E5300-613B-4C9D-9D35-250C01AF9F3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

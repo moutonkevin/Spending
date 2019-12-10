@@ -13,9 +13,9 @@ namespace Spending.Api.Services
             _dataAccess = dataAccess;
         }
 
-        public async Task CategorizeAndSaveTransactionAsync(Transaction transaction, string descriptionContent, int categoryId, int userId)
+        public async Task<bool> CategorizeAndSaveTransactionAsync(Transaction transaction, string descriptionContent, int categoryId, int userId)
         {
-            await _dataAccess.SaveTransactionCategory(transaction, descriptionContent, categoryId, userId);
+            return await _dataAccess.SaveTransactionCategory(transaction, descriptionContent, categoryId, userId);
         }
     }
 }

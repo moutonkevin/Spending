@@ -22,7 +22,7 @@
             </tr>
             @foreach (var transaction in _transactions)
             {
-                <TransactionItemComponent Transaction="@transaction" UserId="@_userIdSelected"/>
+                <TransactionItemComponent Transaction="@transaction" UserId="@_userIdSelected" RemoveTransaction="RemoveTransaction"/>
             }
         </table>
     </div>
@@ -41,5 +41,10 @@
     void SetUserId(int userId)
     {
         _userIdSelected = userId;
+    }
+
+    void RemoveTransaction(Transaction transaction)
+    {
+        _transactions?.Remove(transaction);
     }
 }
