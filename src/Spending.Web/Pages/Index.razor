@@ -1,37 +1,12 @@
 ﻿@page "/"
 @using System.IO
 @using System.Net.Http.Headers
-@using Microsoft.Extensions.WebEncoders.Testing
 @inject HttpClient Http
 @using Newtonsoft.Json
 @using Spending.Api.Models
 @using Spending.Database.Entities
 
-<div>
-    <select @bind="_bankIdSelected">
-        @foreach (var bank in _banks)
-        {
-            <option value=@bank.Id>@bank.Name</option>
-        }
-    </select>
-    <select @bind="_accountIdSelected">
-        @foreach (var account in _accounts)
-        {
-            <option value=@account.Id>@account.Name</option>
-        }
-    </select>
-    <select @bind="_userIdSelected">
-        @foreach (var user in _users)
-        {
-            <option value=@user.Id>@user.Name</option>
-        }
-    </select>
-    <select @bind="_fileTypeIdSelected">
-        <option value="csv">csv</option>
-        <option value="pdf">pdf</option>
-    </select>
-    <InputFile multiple OnChange="HandleFileSelected" />
-</div>
+<UploadStatementComponent SetTransactions="SetTransactions" SetUserId="SetUserId"></UploadStatementComponent>
 
 @if (_transactions != null)
 {
@@ -47,159 +22,24 @@
             </tr>
             @foreach (var transaction in _transactions)
             {
-                <tr>
-                    <td>@transaction.Date</td>
-                    <td>@transaction.Amount</td>
-                    <td>@transaction.TransactionTypeId</td>
-                    <td>@transaction.Description</td>
-                    <td>@transaction.UserId</td>
-                    <td>
-                        <select id="@("select"+rand.Next())" @bind="_categorySelected">
-                            @foreach (var category in _categories)
-                            {
-                                <option value=@category.Id>@category.Name</option>
-                            }
-                        </select>
-                        <input type="text" id="@("input"+rand.Next())" @bind="@_descriptionContent">
-                        <button type="button" id="@("button"+rand.Next())" @onclick="@(e => SaveTransactionCategory(@transaction))">Save</button>
-                    </td>
-                </tr>
+                <TransactionItemComponent Transaction="@transaction" UserId="@_userIdSelected"/>
             }
         </table>
     </div>
 }
 
-@code {
-
-    int _bankIdSelected;
-    int _accountIdSelected;
+@code 
+{
+    IList<Transaction> _transactions = null;
     int _userIdSelected;
-    string _fileTypeIdSelected;
-    IList<Transaction> _transactions;
-    int _categorySelected;
-    string _descriptionContent;
-    Random rand = new Random();
 
-    readonly List<Bank> _banks = new List<Bank>()
+    void SetTransactions(IList<Transaction> transactions)
     {
-        new Bank { Id = 1, Name = "Commonwealth Bank" },
-        new Bank { Id = 2, Name = "American Express" },
-        new Bank { Id = 3, Name = "CityBank" },
-        new Bank { Id = 4, Name = "Westpac" },
-        new Bank { Id = 5, Name = "Qantas" }
-    };
-
-    readonly List<Account> _accounts = new List<Account>()
-    {
-        new Account { Id = 1, Name = "Smart Access", BankId = 1}
-    };
-
-
-    readonly List<User> _users = new List<User>()
-    {
-        new User { Id = 1, Name = "Kevin" }
-    };
-
-    readonly List<Category> _categories = new List<Category>()
-    {
-        new Category { Id = 1, Name = "Rent" },
-        new Category { Id = 2, Name = "Groceries" },
-        new Category { Id = 3, Name = "Health Insurance" },
-        new Category { Id = 4, Name = "Mobile Phone" },
-        new Category { Id = 5, Name = "Electricity" },
-        new Category { Id = 6, Name = "Gas" },
-        new Category { Id = 7, Name = "Entertainment" },
-        new Category { Id = 8, Name = "Internet" },
-        new Category { Id = 9, Name = "Shopping" },
-        new Category { Id = 10, Name = "Holiday" },
-        new Category { Id = 11, Name = "Gym" },
-        new Category { Id = 12, Name = "Transfer Between Accounts" },
-        new Category { Id = 13, Name = "Salary" }
-    };
-
-    HttpContent FormatFileContent(byte[] stream, string contentType, string contentDispositionName, string fileName)
-    {
-        var file = new ByteArrayContent(stream);
-        file.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-        {
-            Name = $"\"{contentDispositionName}\"",
-            FileName = fileName
-        };
-        file.Headers.ContentType = new MediaTypeHeaderValue(contentType);
-
-        return file;
+        _transactions = transactions;
     }
 
-    HttpContent FormatDataContent(string content, string contentType, string contentDispositionName)
+    void SetUserId(int userId)
     {
-        var file = new StringContent(content);
-        file.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-        {
-            Name = $"\"{contentDispositionName}\""
-        };
-        file.Headers.ContentType = new MediaTypeHeaderValue(contentType);
-
-        return file;
+        _userIdSelected = userId;
     }
-
-    async Task HandleFileSelected(IFileListEntry[] files)
-    {
-        try
-        {
-            var content = new MultipartFormDataContent
-            {
-                FormatDataContent(JsonConvert.SerializeObject(new StatementMetadata
-                {
-                    BankId = _bankIdSelected,
-                    AccountId = _accountIdSelected,
-                    UserId = _userIdSelected,
-                    StatementFileType = _fileTypeIdSelected
-                }), "application/json", "statementMetadata")
-            };
-
-            foreach (var file in files)
-            {
-                var ms = new MemoryStream();
-                await file.Data.CopyToAsync(ms);
-
-                content.Add(FormatFileContent(ms.GetBuffer(), "text/csv", "statementFile", file.Name));
-            }
-            var response = await Http.PostAsync("https://localhost:5003/api/statement", content);
-            var responseContent = await response.Content.ReadAsStringAsync();
-            _transactions = JsonConvert.DeserializeObject<IList<Transaction>>(responseContent).OrderBy(t => t.Description).ToList();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        _bankIdSelected = _banks.FirstOrDefault().Id;
-        _accountIdSelected = _accounts.FirstOrDefault().Id;
-        _userIdSelected = _users.FirstOrDefault().Id;
-        _fileTypeIdSelected = "csv";
-        _descriptionContent = "";
-    }
-
-    async Task SaveTransactionCategory(Transaction transaction)
-    {
-        var content = new StringContent(JsonConvert.SerializeObject(transaction));
-        var response = await Http.PostAsync
-            ($"https://localhost:5003/api/transactioncategory?" +
-             $"categoryId={_categorySelected}&userId={_userIdSelected}&descriptionContent={_descriptionContent}",
-                content);
-    }
-
-    private void Test()
-    {
-    }
-
-    private void Test2()
-    {
-        throw new NotImplementedException();
-    }
-
 }
