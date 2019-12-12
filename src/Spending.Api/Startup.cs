@@ -131,11 +131,13 @@ namespace Spending.Api
             #endregion
 
             services.AddScoped<ITransactionDataAccess, TransactionDatabaseDataAccess>();
-            services.AddScoped<ITransactionCategoryDatabaseDataAccess, TransactionCategoryDatabaseDataAccess>();
+            services.AddScoped<ITransactionCategoryPatternDatabaseDataAccess, TransactionCategoryPatternDatabaseDataAccess>();
 
             services
                 .AddDbContext<SpendingContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("SpendingDatabase")));
+                {
+                    options.UseSqlServer(Configuration.GetConnectionString("SpendingDatabase"));
+                });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

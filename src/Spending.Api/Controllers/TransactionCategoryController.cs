@@ -16,6 +16,14 @@ namespace Spending.Api.Controllers
             _transactionCategoryService = transactionCategoryService;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetUncategorizedTransactions(int userId)
+        {
+            var uncategorizedTransactions = await _transactionCategoryService.GetUncategorizedTransactions(userId);
+
+            return Ok(uncategorizedTransactions);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CategorizeTransaction([FromBody]Transaction transaction, string descriptionContent, int categoryId, int userId)
         {

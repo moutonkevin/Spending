@@ -1,0 +1,76 @@
+﻿@page "/transactioncategorypattern"
+@using Newtonsoft.Json
+@using Spending.Database.Entities
+@inject HttpClient Http
+
+<h1>Categorize</h1>
+
+<select @bind="_userIdSelected">
+    @foreach (var user in _users)
+    {
+        <option value=@user.Id>@user.Name</option>
+    }
+</select>
+
+@if (_transactions != null)
+{
+    <div>@_number</div>
+    <div>
+        <table style="width:100%">
+            <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>User</th>
+                <th>Category</th>
+            </tr>
+            @foreach (var transaction in _transactions)
+            {
+                <TransactionItemComponent Transaction="@transaction" UserId="@_userIdSelected" RemoveTransaction="RemoveTransaction" />
+            }
+        </table>
+    </div>
+}
+
+@code {
+
+    readonly List<User> _users = new List<User>()
+    {
+        new User { Id = 1, Name = "Kevin" }
+    };
+
+    int _number;
+    int _userIdSelected;
+    IList<Transaction> _transactions = null;
+    string apiRootUrl = "https://localhost:5003/api";
+
+    async Task<IList<Transaction>> GetUncategorizedTransactions()
+    {
+        var response = await Http.GetAsync($"{apiRootUrl}/TransactionCategory?userId={_userIdSelected}");
+        var responseContent = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<IList<Transaction>>(responseContent).OrderBy(t => t.Description).ToList();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _userIdSelected = 1;
+        _transactions = await GetUncategorizedTransactions();
+        _number = _transactions.Count;
+    }
+
+    void SetTransactions(IList<Transaction> transactions)
+    {
+        _transactions = transactions;
+    }
+
+    void SetUserId(int userId)
+    {
+        _userIdSelected = userId;
+    }
+
+    void RemoveTransaction(Transaction transaction)
+    {
+        _transactions?.Remove(transaction);
+    }
+}

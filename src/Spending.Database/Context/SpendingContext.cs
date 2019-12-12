@@ -12,7 +12,7 @@ namespace Spending.Database.Context
         public DbSet<TransactionType> TransactionType { get; set; }
         public DbSet<User> User { get; set; }
         public DbSet<TransactionCategory> TransactionCategory { get; set; }
-        public DbSet<TransactionDescriptionUserCategory> TransactionDescriptionUserCategory { get; set; }
+        public DbSet<TransactionCategoryPattern> TransactionCategoryPattern { get; set; }
 
         //used by the Database.Migration
         public SpendingContext()

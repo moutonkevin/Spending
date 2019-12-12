@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Spending.Api.DataAccess;
 using Spending.Database.Entities;
 
@@ -6,16 +7,21 @@ namespace Spending.Api.Services
 {
     public class TransactionCategoryService : ITransactionCategoryService
     {
-        private readonly ITransactionCategoryDatabaseDataAccess _dataAccess;
+        private readonly ITransactionCategoryPatternDatabaseDataAccess _dataAccess;
 
-        public TransactionCategoryService(ITransactionCategoryDatabaseDataAccess dataAccess)
+        public TransactionCategoryService(ITransactionCategoryPatternDatabaseDataAccess dataAccess)
         {
             _dataAccess = dataAccess;
         }
 
+        public async Task<IEnumerable<Transaction>> GetUncategorizedTransactions(int userId)
+        {
+            return await _dataAccess.GetUncategorizedTransactions(userId);
+        }
+
         public async Task<bool> CategorizeAndSaveTransactionAsync(Transaction transaction, string descriptionContent, int categoryId, int userId)
         {
-            return await _dataAccess.SaveTransactionCategory(transaction, descriptionContent, categoryId, userId);
+            return await _dataAccess.SaveTransactionCategoryPattern(transaction, descriptionContent, categoryId, userId);
         }
     }
 }
