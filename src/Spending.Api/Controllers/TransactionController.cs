@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Spending.Api.Models;
 using Spending.Api.Services;
 
 namespace Spending.Api.Controllers
@@ -20,7 +22,7 @@ namespace Spending.Api.Controllers
         {
             var uncategorizedTransactions = await _transactionService.GetUncategorizedTransactions(userId);
 
-            return Ok(uncategorizedTransactions);
+            return Ok(uncategorizedTransactions.ToList());
         }
     }
 }

@@ -33,7 +33,7 @@
 
 @code {
 
-    [Parameter] public EventCallback<IList<Transaction>> SetTransactions { get; set; }
+    [Parameter] public EventCallback<IList<Spending.Database.Entities.Transaction>> SetTransactions { get; set; }
     [Parameter] public EventCallback<int> SetUserId { get; set; }
 
     int _bankIdSelected;
@@ -111,7 +111,7 @@
             }
             var response = await Http.PostAsync($"{apiRootUrl}/statement", content);
             var responseContent = await response.Content.ReadAsStringAsync();
-            var transactions = JsonConvert.DeserializeObject<IList<Transaction>>(responseContent).OrderBy(t => t.Description).ToList();
+            var transactions = JsonConvert.DeserializeObject<IList<Spending.Database.Entities.Transaction>>(responseContent).OrderBy(t => t.Description).ToList();
 
             await SetTransactions.InvokeAsync(transactions);
             await SetUserId.InvokeAsync(_userIdSelected);

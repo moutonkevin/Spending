@@ -4,7 +4,6 @@
 @inject HttpClient Http
 @using Newtonsoft.Json
 @using Spending.Api.Models
-@using Spending.Database.Entities
 
 <UploadStatementComponent SetTransactions="SetTransactions" SetUserId="SetUserId"></UploadStatementComponent>
 
@@ -30,10 +29,10 @@
 
 @code 
 {
-    IList<Transaction> _transactions = null;
+    IList<Spending.Database.Entities.Transaction> _transactions = null;
     int _userIdSelected;
 
-    void SetTransactions(IList<Transaction> transactions)
+    void SetTransactions(IList<Spending.Database.Entities.Transaction> transactions)
     {
         _transactions = transactions;
     }
@@ -43,7 +42,7 @@
         _userIdSelected = userId;
     }
 
-    void RemoveTransaction(Transaction transaction)
+    void RemoveTransaction(Spending.Database.Entities.Transaction transaction)
     {
         _transactions?.Remove(transaction);
     }

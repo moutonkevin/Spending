@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
@@ -77,7 +78,7 @@ namespace Spending.Api
             
             services.AddScoped<Func<string, string, IParserService>>(serviceProvider => (bankKey, fileTypeKey) =>
             {
-                if (bankKey.Equals(Banks.Mapping[1]))
+                if (bankKey.Equals(Database.Constants.Banks.List.FirstOrDefault(b => b.Id == 1)))
                 {
                     if (fileTypeKey.Equals(Constants.Pdf))
                     {
@@ -92,7 +93,7 @@ namespace Spending.Api
                         throw new KeyNotFoundException(fileTypeKey);
                     }
                 }
-                else if (bankKey.Equals(Banks.Mapping[2]))
+                else if (bankKey.Equals(Database.Constants.Banks.List.FirstOrDefault(b => b.Id == 2)))
                 {
                     if (fileTypeKey.Equals(Constants.Pdf))
                     {
@@ -107,7 +108,7 @@ namespace Spending.Api
                         throw new KeyNotFoundException(fileTypeKey);
                     }
                 }
-                else if (bankKey.Equals(Banks.Mapping[5]))
+                else if (bankKey.Equals(Database.Constants.Banks.List.FirstOrDefault(b => b.Id == 5)))
                 {
                     if (fileTypeKey.Equals(Constants.Pdf))
                     {
@@ -137,6 +138,7 @@ namespace Spending.Api
                 .AddDbContext<SpendingContext>(options =>
                 {
                     options.UseSqlServer(Configuration.GetConnectionString("SpendingDatabase"));
+                    options.EnableSensitiveDataLogging();
                 });
         }
 

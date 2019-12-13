@@ -1,4 +1,5 @@
-﻿@using Spending.Database.Entities
+﻿@using Spending.Database
+@using Spending.Database.Entities
 
 <select @onchange="OnChanged">
     @foreach (var user in _users)
@@ -12,11 +13,7 @@
     [Parameter] public int UserId { get; set; }
     [Parameter] public EventCallback<int> SetUserId { get; set; }
 
-    readonly List<User> _users = new List<User>
-    {
-        new User { Id = 1, Name = "Kevin" },
-        new User { Id = 2, Name = "Mika" }
-    };
+    readonly IReadOnlyList<User> _users = Constants.Users.List;
 
     public async Task OnChanged(ChangeEventArgs e) => await SetUserId.InvokeAsync(int.Parse((string)e.Value));
 

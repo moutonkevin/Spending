@@ -1,16 +1,11 @@
 ﻿@page "/categorize"
 @using Newtonsoft.Json
-@using Spending.Database.Entities
+@using Spending.Api.Models
 @inject HttpClient Http
 
 <h1>Categorize</h1>
 
-<select @bind="_userIdSelected">
-    @foreach (var user in _users)
-    {
-        <option value=@user.Id>@user.Name</option>
-    }
-</select>
+<UserDropDownComponent SetUserId="@SetUserId" />
 
 @if (_transactions != null)
 {
@@ -22,23 +17,27 @@
                 <th>Amount</th>
                 <th>Type</th>
                 <th>Description</th>
-                <th>User</th>
                 <th>Category</th>
             </tr>
             @foreach (var transaction in _transactions)
             {
-                <TransactionItemComponent Transaction="@transaction" UserId="@_userIdSelected" RemoveTransaction="RemoveTransaction" />
+                <tr>
+                    <td>@transaction.Date</td>
+                    <td>@transaction.Amount</td>
+                    <td>@transaction.TransactionTypeId</td>
+                    <td>@transaction.Description</td>
+                    <td>
+                        <CategoryDropDownComponent CategoryId="1" TransactionCategoryPatternId="@transaction.Id" SetCategoryId="@SetCategoryId" />
+                        <input type="text" @bind="@transaction.Description">
+                        <button type="button" @onclick="@(e => SaveTransactionCategory(transaction))">Save</button>
+                    </td>
+                </tr>
             }
         </table>
     </div>
 }
 
 @code {
-
-    readonly List<User> _users = new List<User>()
-    {
-        new User { Id = 1, Name = "Kevin" }
-    };
 
     int _number;
     int _userIdSelected;
@@ -47,30 +46,50 @@
 
     async Task<IList<Transaction>> GetUncategorizedTransactions()
     {
-        var response = await Http.GetAsync($"{apiRootUrl}/transaction?userId={_userIdSelected}");
-        var responseContent = await response.Content.ReadAsStringAsync();
-        return JsonConvert.DeserializeObject<IList<Transaction>>(responseContent).OrderBy(t => t.Description).ToList();
+        return await Http.GetJsonAsync<IList<Transaction>>($"{apiRootUrl}/transaction?userId={_userIdSelected}");
+    }
+
+    async Task SaveTransactionCategory(Transaction transaction)
+    {
+        var isSuccess = await Http.PostJsonAsync<bool>($"{apiRootUrl}/TransactionCategoryPattern?userId={_userIdSelected}",
+            new Api.Models.TransactionCategoryPattern
+            {
+                CategoryId = transaction.CategoryId,
+                Pattern = transaction.Description
+            });
+
+        if (isSuccess)
+        {
+            await LoadTransactionsAsync();
+        }
     }
 
     protected override async Task OnInitializedAsync()
     {
-        _userIdSelected = 1;
+        await SetUserId(1);
+    }
+
+    async Task SetUserId(int userId)
+    {
+        _userIdSelected = userId;
+        await LoadTransactionsAsync();
+    }
+
+    async Task LoadTransactionsAsync()
+    {
         _transactions = await GetUncategorizedTransactions();
         _number = _transactions.Count;
     }
 
-    void SetTransactions(IList<Transaction> transactions)
+    private void SetCategoryId(Tuple<int, int> category)
     {
-        _transactions = transactions;
-    }
+        var categoryId = category.Item1;
+        var transactionId = category.Item2;
 
-    void SetUserId(int userId)
-    {
-        _userIdSelected = userId;
-    }
-
-    void RemoveTransaction(Transaction transaction)
-    {
-        _transactions?.Remove(transaction);
+        var transaction = _transactions.FirstOrDefault(f => f.Id == transactionId);
+        if (transaction != null)
+        {
+            transaction.CategoryId = categoryId;
+        }
     }
 }

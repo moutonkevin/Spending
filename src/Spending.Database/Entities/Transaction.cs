@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Spending.Database.Entities
+﻿namespace Spending.Database.Entities
 {
     public class Transaction
     {

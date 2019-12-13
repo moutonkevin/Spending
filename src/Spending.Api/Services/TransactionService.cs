@@ -36,7 +36,7 @@ namespace Spending.Api.Services
 
         private IParserService GetParserService(int bankId, string fileType)
         {
-            var bankName = Banks.Mapping.ContainsKey(bankId) ? Banks.Mapping[bankId] : null;
+            var bankName = Database.Constants.Banks.List.FirstOrDefault(b => b.Id == bankId)?.Name;
 
             return _parserServiceResolver.Invoke(bankName, fileType);
         }
@@ -46,7 +46,7 @@ namespace Spending.Api.Services
             return _textExtractorResolver.Invoke(fileType);
         }
 
-        private void ConsolidateTransactions(StatementMetadata statementMetadata, IEnumerable<Transaction> transactions)
+        private void ConsolidateTransactions(StatementMetadata statementMetadata, IEnumerable<Spending.Database.Entities.Transaction> transactions)
         {
             foreach (var transaction in transactions)
             {
@@ -55,11 +55,11 @@ namespace Spending.Api.Services
             }
         }
 
-        private void GroupSimilarTransactions(IList<Transaction> transactions)
+        private void GroupSimilarTransactions(IList<Spending.Database.Entities.Transaction> transactions)
         {
             var groupedTransactions = transactions.GroupBy(x => new {x.Amount, x.TransactionTypeId, x.Date, x.Description, x.UserId}).ToList();
             var similarTransactionsGrouped = groupedTransactions.Where(groupedTransaction => groupedTransaction.Count() > 1).ToList();
-            var similarTransactionsMerged = similarTransactionsGrouped.Select(s => new Transaction
+            var similarTransactionsMerged = similarTransactionsGrouped.Select(s => new Spending.Database.Entities.Transaction
             {
                 Description = s.FirstOrDefault().Description,
                 Date = s.FirstOrDefault().Date,
@@ -80,12 +80,12 @@ namespace Spending.Api.Services
             similarTransactionsMerged.ForEach(transactions.Add);
         }
 
-        public async Task<IEnumerable<Transaction>> SaveAsync(StatementMetadata statementMetadata, IFormFileCollection files)
+        public async Task<IEnumerable<Spending.Database.Entities.Transaction>> SaveAsync(StatementMetadata statementMetadata, IFormFileCollection files)
         {
             var parserService = GetParserService(statementMetadata.BankId, statementMetadata.StatementFileType);
             var extractorService = GetExtractorServiceForFileType(statementMetadata.StatementFileType);
 
-            var combinedTransactions = new List<Transaction>();
+            var combinedTransactions = new List<Spending.Database.Entities.Transaction>();
 
             foreach (var file in files)
             {
@@ -104,9 +104,19 @@ namespace Spending.Api.Services
             return combinedTransactions;
         }
 
-        public async Task<IEnumerable<Transaction>> GetUncategorizedTransactions(int userId)
+        public async Task<IEnumerable<Spending.Api.Models.Transaction>> GetUncategorizedTransactions(int userId)
         {
-            return await _transactionDataAccess.GetUncategorizedTransactions(userId);
+            var uncategorizedTransactions = await _transactionDataAccess.GetUncategorizedTransactions(userId);
+
+            return uncategorizedTransactions.Select(s => new Spending.Api.Models.Transaction
+            {
+                Description = s.Description,
+                Id = s.Id,
+                Amount = s.Amount,
+                Date = s.Date,
+                TransactionTypeId = s.TransactionTypeId,
+                CategoryId = Database.Constants.Categories.List.First().Id
+            }).OrderBy(o => o.Description);
         }
     }
 }
