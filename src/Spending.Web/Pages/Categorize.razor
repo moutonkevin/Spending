@@ -1,7 +1,9 @@
 ﻿@page "/categorize"
-@using Newtonsoft.Json
+@using Microsoft.Extensions.Options
 @using Spending.Api.Models
 @inject HttpClient Http
+@inject IOptions<Configuration> ConfigOptions
+@using Spending.Web.Pages.Components
 
 <h1>Categorize</h1>
 
@@ -27,7 +29,7 @@
                     <td>@transaction.TransactionTypeId</td>
                     <td>@transaction.Description</td>
                     <td>
-                        <CategoryDropDownComponent CategoryId="1" TransactionCategoryPatternId="@transaction.Id" SetCategoryId="@SetCategoryId" />
+                        <CategoryDropDownComponent CategoryId="1" ExternalId="@transaction.Id" SetCategoryId="@SetCategoryId" />
                         <input type="text" @bind="@transaction.Description">
                         <button type="button" @onclick="@(e => SaveTransactionCategory(transaction))">Save</button>
                     </td>
@@ -42,16 +44,15 @@
     int _number;
     int _userIdSelected;
     IList<Transaction> _transactions = null;
-    string apiRootUrl = "https://localhost:5003/api";
 
     async Task<IList<Transaction>> GetUncategorizedTransactions()
     {
-        return await Http.GetJsonAsync<IList<Transaction>>($"{apiRootUrl}/transaction?userId={_userIdSelected}");
+        return await Http.GetJsonAsync<IList<Transaction>>($"{ConfigOptions.Value.ApiBaseUrl}/transaction?userId={_userIdSelected}");
     }
 
     async Task SaveTransactionCategory(Transaction transaction)
     {
-        var isSuccess = await Http.PostJsonAsync<bool>($"{apiRootUrl}/TransactionCategoryPattern?userId={_userIdSelected}",
+        var isSuccess = await Http.PostJsonAsync<bool>($"{ConfigOptions.Value.ApiBaseUrl}/TransactionCategoryPattern?userId={_userIdSelected}",
             new Api.Models.TransactionCategoryPattern
             {
                 CategoryId = transaction.CategoryId,

@@ -29,6 +29,7 @@ namespace Spending.Web
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddScoped<HttpClient>();
+            services.Configure<Configuration>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

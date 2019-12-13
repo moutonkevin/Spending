@@ -1,0 +1,19 @@
+﻿@using Spending.Web.Data
+
+<select @onchange="OnChanged">
+    @foreach (var item in Source)
+    {
+        <option selected="@IsSelected(item)" value=@item.Id>@item.DisplayName</option>
+    }
+</select>
+
+@code {
+
+    [Parameter] public int SelectedId { get; set; }
+    [Parameter] public IReadOnlyList<GenericDropDown> Source { get; set; }
+    [Parameter] public EventCallback<int> SetSelectedId { get; set; }
+
+    public async Task OnChanged(ChangeEventArgs e) => await SetSelectedId.InvokeAsync(int.Parse((string)e.Value));
+
+    public bool IsSelected(GenericDropDown item) => item.Id == SelectedId;
+}

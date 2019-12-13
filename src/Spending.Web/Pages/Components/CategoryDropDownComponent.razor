@@ -11,12 +11,12 @@
 @code {
 
     [Parameter] public int CategoryId { get; set; }
-    [Parameter] public int TransactionCategoryPatternId { get; set; }
+    [Parameter] public int ExternalId { get; set; }
     [Parameter] public EventCallback<Tuple<int,int>> SetCategoryId { get; set; }
 
     readonly IReadOnlyList<Category> _categories = Constants.Categories.List;
 
-    public async Task OnChanged(ChangeEventArgs e) => await SetCategoryId.InvokeAsync(new Tuple<int, int>(int.Parse((string) e.Value), TransactionCategoryPatternId));
+    public async Task OnChanged(ChangeEventArgs e) => await SetCategoryId.InvokeAsync(new Tuple<int, int>(int.Parse((string) e.Value), ExternalId));
 
     public bool IsSelected(Category category) => category.Id == CategoryId;
 }

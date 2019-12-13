@@ -1,10 +1,13 @@
 ﻿@page "/transactioncategorypattern"
+@using Microsoft.Extensions.Options
 @using Newtonsoft.Json
 @inject HttpClient Http
+@inject IOptions<Configuration> ConfigOptions
+@using Spending.Web.Pages.Components
 
 <h1>User Patterns</h1>
 
-<UserDropDownComponent SetUserId="@SetUserId"/>
+<UserDropDownComponent SetUserId="@SetUserId" />
 
 @if (_transactionsCategoryPatterns != null)
 {
@@ -18,18 +21,18 @@
             </tr>
             @foreach (var transactionsCategoryPattern in _transactionsCategoryPatterns)
             {
-        <tr>
-            <td>
-                <CategoryDropDownComponent CategoryId="@transactionsCategoryPattern.CategoryId" TransactionCategoryPatternId="@transactionsCategoryPattern.Id" SetCategoryId="@SetCategoryId" />
-            </td>
-            <td>
-                <input type="text" @bind="@transactionsCategoryPattern.Pattern">
-            </td>
-            <td>
-                <button type="button" @onclick="@(e => UpdateTransactionCategoryPattern(transactionsCategoryPattern))">Update</button>
-                <button type="button" @onclick="@(e => DeleteTransactionCategoryPattern(transactionsCategoryPattern))">Delete</button>
-            </td>
-            </tr>
+                <tr>
+                    <td>
+                        <CategoryDropDownComponent CategoryId="@transactionsCategoryPattern.CategoryId" ExternalId="@transactionsCategoryPattern.Id" SetCategoryId="@SetCategoryId" />
+                    </td>
+                    <td>
+                        <input type="text" @bind="@transactionsCategoryPattern.Pattern">
+                    </td>
+                    <td>
+                        <button type="button" @onclick="@(e => UpdateTransactionCategoryPattern(transactionsCategoryPattern))">Update</button>
+                        <button type="button" @onclick="@(e => DeleteTransactionCategoryPattern(transactionsCategoryPattern))">Delete</button>
+                    </td>
+                </tr>
             }
         </table>
     </div>
@@ -49,18 +52,18 @@
     async Task<IList<Spending.Api.Models.TransactionCategoryPattern>> GetTransactionCategoryPattern()
     {
         return await Http.GetJsonAsync<IList<Spending.Api.Models.TransactionCategoryPattern>>(
-            $"https://localhost:5003/api/TransactionCategoryPattern?userId={_userIdSelected}");
+            $"{ConfigOptions.Value.ApiBaseUrl}/TransactionCategoryPattern?userId={_userIdSelected}");
     }
 
     async Task UpdateTransactionCategoryPattern(Spending.Api.Models.TransactionCategoryPattern transactionCategoryPattern)
     {
-        var isSuccess = await Http.PutJsonAsync<bool>($"https://localhost:5003/api/TransactionCategoryPattern?userId={_userIdSelected}",
+        var isSuccess = await Http.PutJsonAsync<bool>($"{ConfigOptions.Value.ApiBaseUrl}/api/TransactionCategoryPattern?userId={_userIdSelected}",
             transactionCategoryPattern);
     }
 
     async Task DeleteTransactionCategoryPattern(Spending.Api.Models.TransactionCategoryPattern transactionCategoryPattern)
     {
-        var response = await Http.DeleteAsync($"https://localhost:5003/api/TransactionCategoryPattern?transactionCategoryPatternId={transactionCategoryPattern.Id}");
+        var response = await Http.DeleteAsync($"{ConfigOptions.Value.ApiBaseUrl}/api/TransactionCategoryPattern?transactionCategoryPatternId={transactionCategoryPattern.Id}");
         var isSuccess = JsonConvert.DeserializeObject<bool>(await response.Content.ReadAsStringAsync());
 
         if (isSuccess)

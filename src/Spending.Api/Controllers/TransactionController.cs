@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Spending.Api.Models;
 using Spending.Api.Services;
 
 namespace Spending.Api.Controllers

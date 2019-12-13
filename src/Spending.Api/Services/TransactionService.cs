@@ -8,7 +8,6 @@ using Spending.Api.DataAccess;
 using Spending.Api.Models;
 using Spending.Api.Services.Extractors;
 using Spending.Api.Services.Parsers;
-using Spending.Database.Entities;
 
 namespace Spending.Api.Services
 {

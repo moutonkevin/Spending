@@ -1,49 +1,133 @@
 ﻿@page "/"
 @using System.IO
 @using System.Net.Http.Headers
-@inject HttpClient Http
+@using Microsoft.Extensions.Options
 @using Newtonsoft.Json
 @using Spending.Api.Models
+@using Spending.Database
+@using Spending.Database.Entities
+@using Spending.Web.Data
+@inject HttpClient Http
+@using  Spending.Web.Pages.Components
+@inject IOptions<Configuration> ConfigsOptions
 
-<UploadStatementComponent SetTransactions="SetTransactions" SetUserId="SetUserId"></UploadStatementComponent>
-
-@if (_transactions != null)
-{
     <div>
-        <table style="width:100%">
-            <tr>
-                <th>Date</th>
-                <th>Amount</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th>User</th>
-                <th>Category</th>
-            </tr>
-            @foreach (var transaction in _transactions)
-            {
-                <TransactionItemComponent Transaction="@transaction" UserId="@_userIdSelected" RemoveTransaction="RemoveTransaction"/>
-            }
-        </table>
+        <GenericDropDownComponent Source="@Constants.Banks.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetBankId" />
+        <GenericDropDownComponent Source="@Constants.Accounts.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetAccountId" />
+        <GenericDropDownComponent Source="@Constants.Users.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetUserId" />
+        <GenericDropDownComponent Source="@(new List<GenericDropDown> {new GenericDropDown {Id = 1, DisplayName = Api.Constants.Csv}, new GenericDropDown {Id = 2, DisplayName = Api.Constants.Pdf}})" SetSelectedId="@SetFileTypeId" />
+
+        <InputFile multiple OnChange="HandleFileSelected" />
     </div>
-}
 
-@code 
-{
-    IList<Spending.Database.Entities.Transaction> _transactions = null;
+@code {
+
+    private void SetBankId(int id)
+    {
+        _bankIdSelected = id;
+    }
+
+    private void SetAccountId(int id)
+    {
+        _accountIdSelected = id;
+    }
+
+    private void SetUserId(int id)
+    {
+        _bankIdSelected = id;
+    }
+
+    private void SetFileTypeId(int id)
+    {
+        _fileTypeIdSelected = id; Send ID instead of stringf
+    }
+
+    int _bankIdSelected;
+    int _accountIdSelected;
     int _userIdSelected;
+    string _fileTypeIdSelected;
 
-    void SetTransactions(IList<Spending.Database.Entities.Transaction> transactions)
+    readonly List<Bank> _banks = new List<Bank>()
+{
+        new Bank { Id = 1, Name = "Commonwealth Bank" },
+        new Bank { Id = 2, Name = "American Express" },
+        new Bank { Id = 3, Name = "CityBank" },
+        new Bank { Id = 4, Name = "Westpac" },
+        new Bank { Id = 5, Name = "Qantas" }
+    };
+
+    readonly List<Account> _accounts = new List<Account>()
+{
+        new Account { Id = 1, Name = "Smart Access", BankId = 1}
+    };
+
+
+    readonly List<User> _users = new List<User>()
+{
+        new User { Id = 1, Name = "Kevin" }
+    };
+
+    HttpContent FormatFileContent(byte[] stream, string contentType, string contentDispositionName, string fileName)
     {
-        _transactions = transactions;
+        var file = new ByteArrayContent(stream);
+        file.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+        {
+            Name = $"\"{contentDispositionName}\"",
+            FileName = fileName
+        };
+        file.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+
+        return file;
     }
 
-    void SetUserId(int userId)
+    HttpContent FormatDataContent(string content, string contentType, string contentDispositionName)
     {
-        _userIdSelected = userId;
+        var file = new StringContent(content);
+        file.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+        {
+            Name = $"\"{contentDispositionName}\""
+        };
+        file.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+
+        return file;
     }
 
-    void RemoveTransaction(Spending.Database.Entities.Transaction transaction)
+    async Task HandleFileSelected(IFileListEntry[] files)
     {
-        _transactions?.Remove(transaction);
+        try
+        {
+            var content = new MultipartFormDataContent
+{
+                FormatDataContent(JsonConvert.SerializeObject(new StatementMetadata
+                {
+                    BankId = _bankIdSelected,
+                    AccountId = _accountIdSelected,
+                    UserId = _userIdSelected,
+                    StatementFileType = _fileTypeIdSelected
+                }), "application/json", "statementMetadata")
+            };
+
+            foreach (var file in files)
+            {
+                var ms = new MemoryStream();
+                await file.Data.CopyToAsync(ms);
+
+                content.Add(FormatFileContent(ms.GetBuffer(), "text/csv", "statementFile", file.Name));
+            }
+            var transactions = await Http.PostJsonAsync<IList<Spending.Database.Entities.Transaction>>($"{ConfigsOptions.Value.ApiBaseUrl}/statement", content);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _bankIdSelected = _banks.FirstOrDefault().Id;
+        _accountIdSelected = _accounts.FirstOrDefault().Id;
+        _userIdSelected = _users.FirstOrDefault().Id;
+        _fileTypeIdSelected = "csv";
     }
 }
