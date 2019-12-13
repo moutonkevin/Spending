@@ -3,16 +3,15 @@
 <select @onchange="OnChanged">
     @foreach (var category in _categories)
     {
-        <option selected="@IsSelected(@category)" value=@category.Id>@category.Name</option>
+        <option selected="@IsSelected(category)" value=@category.Id>@category.Name</option>
     }
 </select>
 
 @code {
 
-    [Parameter]
-    public int CategoryId { get; set; }
-
-    [Parameter] public EventCallback<int> SetCategoryId { get; set; }
+    [Parameter] public int CategoryId { get; set; }
+    [Parameter] public int TransactionCategoryPatternId { get; set; }
+    [Parameter] public EventCallback<Tuple<int,int>> SetCategoryId { get; set; }
 
     readonly List<Category> _categories = new List<Category>
     {
@@ -31,15 +30,7 @@
         new Category { Id = 13, Name = "Salary" }
     };
 
-    public async Task OnChanged(ChangeEventArgs e)
-    {
-        var categoryId = int.Parse((string)e.Value);
+    public async Task OnChanged(ChangeEventArgs e) => await SetCategoryId.InvokeAsync(new Tuple<int, int>(int.Parse((string) e.Value), TransactionCategoryPatternId));
 
-        await SetCategoryId.InvokeAsync(categoryId);
-    }
-
-    public bool IsSelected(Category category)
-    {
-        return category.Id == CategoryId;
-    }
+    public bool IsSelected(Category category) => category.Id == CategoryId;
 }

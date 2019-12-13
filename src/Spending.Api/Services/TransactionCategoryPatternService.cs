@@ -15,9 +15,19 @@ namespace Spending.Api.Services
             _dataAccess = dataAccess;
         }
 
-        public async Task<bool> SavePatternAsync(string descriptionContent, int categoryId, int userId)
+        public async Task<bool> SavePatternAsync(string pattern, int categoryId, int userId)
         {
-            return await _dataAccess.SavePatternAsync(descriptionContent, categoryId, userId);
+            return await _dataAccess.SavePatternAsync(pattern, categoryId, userId);
+        }
+
+        public async Task<bool> UpdatePatternAsync(int id, string pattern, int categoryId, int userId)
+        {
+            return await _dataAccess.UpdatePatternAsync(id, pattern, categoryId, userId);
+        }
+
+        public async Task<bool> DeletePatternAsync(int id)
+        {
+            return await _dataAccess.DeletePatternAsync(id);
         }
 
         public async Task<IList<TransactionCategoryPattern>> GetAllPatternsAsync(int userId)

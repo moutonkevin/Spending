@@ -1,35 +1,36 @@
 ﻿@page "/transactioncategorypattern"
 @using System.Text
 @using Newtonsoft.Json
-@using Spending.Database.Entities
 @inject HttpClient Http
 
-<h1>Categorize</h1>
+<h1>User Patterns</h1>
 
 <UserDropDownComponent SetUserId="@SetUserId"/>
 
 @if (_transactionsCategoryPatterns != null)
 {
-    <div>@_number</div>
+    <div>Number of records: @_recordsNumber</div>
     <div>
         <table style="width:100%">
             <tr>
                 <th>Category</th>
                 <th>Pattern</th>
+                <th></th>
             </tr>
             @foreach (var transactionsCategoryPattern in _transactionsCategoryPatterns)
             {
-                <tr>
-                    <td>
-                        <CategoryDropDownComponent CategoryId="@transactionsCategoryPattern.CategoryId" SetCategoryId="@SetCategoryId"/>
-                    </td>
-                    <td>
-                        <input type="text" id="@("input"+rand.Next())" @bind="@transactionsCategoryPattern.Pattern">
-                    </td>
-                    <td>
-                        <button type="button" id="@("button"+rand.Next())" @onclick="@(e => SaveTransactionCategoryPattern(@transactionsCategoryPattern))">Save</button>
-                    </td>
-                </tr>
+        <tr>
+            <td>
+                <CategoryDropDownComponent CategoryId="@transactionsCategoryPattern.CategoryId" TransactionCategoryPatternId="@transactionsCategoryPattern.Id" SetCategoryId="@SetCategoryId" />
+            </td>
+            <td>
+                <input type="text" @bind="@transactionsCategoryPattern.Pattern">
+            </td>
+            <td>
+                <button type="button" @onclick="@(e => UpdateTransactionCategoryPattern(transactionsCategoryPattern))">Update</button>
+                <button type="button" @onclick="@(e => DeleteTransactionCategoryPattern(transactionsCategoryPattern))">Delete</button>
+            </td>
+            </tr>
             }
         </table>
     </div>
@@ -37,68 +38,54 @@
 
 @code {
 
-    readonly List<User> _users = new List<User>()
-    {
-        new User { Id = 1, Name = "Kevin" }
-    };
-
-    readonly List<Category> _categories = new List<Category>()
-    {
-        new Category { Id = 1, Name = "Rent" },
-        new Category { Id = 2, Name = "Groceries" },
-        new Category { Id = 3, Name = "Health Insurance" },
-        new Category { Id = 4, Name = "Mobile Phone" },
-        new Category { Id = 5, Name = "Electricity" },
-        new Category { Id = 6, Name = "Gas" },
-        new Category { Id = 7, Name = "Entertainment" },
-        new Category { Id = 8, Name = "Internet" },
-        new Category { Id = 9, Name = "Shopping" },
-        new Category { Id = 10, Name = "Holiday" },
-        new Category { Id = 11, Name = "Gym" },
-        new Category { Id = 12, Name = "Transfer Between Accounts" },
-        new Category { Id = 13, Name = "Salary" }
-    };
-
-    int _number;
+    int _recordsNumber;
     int _userIdSelected;
-    int _categorySelected;
-    string _descriptionContent;
     IList<Spending.Api.Models.TransactionCategoryPattern> _transactionsCategoryPatterns = null;
-    Random rand = new Random();
-    string apiRootUrl = "https://localhost:5003/api";
 
     protected override async Task OnInitializedAsync()
     {
-        _userIdSelected = _users.FirstOrDefault().Id;
-        _transactionsCategoryPatterns = await GetTransactionCategoryPattern();
-        _number = _transactionsCategoryPatterns.Count;
+        await SetUserId(1);
     }
 
     async Task<IList<Spending.Api.Models.TransactionCategoryPattern>> GetTransactionCategoryPattern()
     {
-        var response = await Http.GetAsync($"{apiRootUrl}/TransactionCategoryPattern?userId={_userIdSelected}");
-        var responseContent = await response.Content.ReadAsStringAsync();
-        return JsonConvert.DeserializeObject<IList<Spending.Api.Models.TransactionCategoryPattern>>(responseContent).ToList();
+        return await Http.GetJsonAsync<IList<Spending.Api.Models.TransactionCategoryPattern>>(
+            $"https://localhost:5003/api/TransactionCategoryPattern?userId={_userIdSelected}");
     }
 
-    async Task SaveTransactionCategoryPattern(Spending.Api.Models.TransactionCategoryPattern transactionCategoryPattern)
+    async Task UpdateTransactionCategoryPattern(Spending.Api.Models.TransactionCategoryPattern transactionCategoryPattern)
     {
-        var content = new StringContent(JsonConvert.SerializeObject(transactionCategoryPattern), Encoding.UTF8, "application/json");
-        var response = await Http.PostAsync(
-            $"{apiRootUrl}/transactioncategorypattern?categoryId={_categorySelected}&userId={_userIdSelected}&descriptionContent={_descriptionContent}",
-            content);
-
-        var res = await response.Content.ReadAsStringAsync();
-        var isSuccess = JsonConvert.DeserializeAnonymousType(res, new {IsSuccess = true});
+        var isSuccess = await Http.PutJsonAsync<bool>($"https://localhost:5003/api/TransactionCategoryPattern?userId={_userIdSelected}",
+            transactionCategoryPattern);
     }
 
-    private void SetCategoryId(int categoryId)
+    async Task DeleteTransactionCategoryPattern(Spending.Api.Models.TransactionCategoryPattern transactionCategoryPattern)
     {
-        _categorySelected = categoryId;
+        var response = await Http.DeleteAsync($"https://localhost:5003/api/TransactionCategoryPattern?transactionCategoryPatternId={transactionCategoryPattern.Id}");
+        var isSuccess = JsonConvert.DeserializeObject<bool>(await response.Content.ReadAsStringAsync());
+
+        if (isSuccess)
+        {
+            _transactionsCategoryPatterns.Remove(transactionCategoryPattern);
+        }
     }
 
-    private void SetUserId(int userId)
+    private void SetCategoryId(Tuple<int, int> category)
+    {
+        var categoryId = category.Item1;
+        var transactionsCategoryPatternId = category.Item2;
+
+        var transactionsCategoryPattern = _transactionsCategoryPatterns.FirstOrDefault(f => f.Id == transactionsCategoryPatternId);
+        if (transactionsCategoryPattern != null)
+        {
+            transactionsCategoryPattern.CategoryId = categoryId;
+        }
+    }
+
+    private async Task SetUserId(int userId)
     {
         _userIdSelected = userId;
+        _transactionsCategoryPatterns = await GetTransactionCategoryPattern();
+        _recordsNumber = _transactionsCategoryPatterns.Count;
     }
 }

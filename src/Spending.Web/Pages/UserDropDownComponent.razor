@@ -1,37 +1,24 @@
 ﻿@using Spending.Database.Entities
 
-<select id="@("select"+rand.Next())" @onchange="@OnChanged">
+<select @onchange="OnChanged">
     @foreach (var user in _users)
     {
-        <option value=@user.Id>@user.Name</option>
+        <option selected="@IsSelected(user)" value=@user.Id>@user.Name</option>
     }
 </select>
 
 @code {
 
-    [Parameter]
-    public int UserId { get; set; }
-
+    [Parameter] public int UserId { get; set; }
     [Parameter] public EventCallback<int> SetUserId { get; set; }
 
-    readonly List<User> _users = new List<User>()
+    readonly List<User> _users = new List<User>
     {
         new User { Id = 1, Name = "Kevin" },
         new User { Id = 2, Name = "Mika" }
     };
 
-Random rand = new Random();
+    public async Task OnChanged(ChangeEventArgs e) => await SetUserId.InvokeAsync(int.Parse((string)e.Value));
 
-    public void OnChanged(ChangeEventArgs e)
-    {
-        var userId = int.Parse((string)e.Value);
-
-        UserId = userId;
-        SetUserId.InvokeAsync(userId);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-
-    }
+    public bool IsSelected(User user) => user.Id == UserId;
 }

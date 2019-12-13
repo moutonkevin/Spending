@@ -20,13 +20,13 @@ namespace Spending.Api.DataAccess
             _spendingContext = spendingContext;
         }
 
-        public async Task<bool> SavePatternAsync(string descriptionContent, int categoryId, int userId)
+        public async Task<bool> SavePatternAsync(string pattern, int categoryId, int userId)
         {
             try
             {
                 await _spendingContext.TransactionCategoryPattern.AddAsync(new TransactionCategoryPattern
                 {
-                    Pattern = descriptionContent,
+                    Pattern = pattern,
                     CategoryId = categoryId,
                     UserId = userId
                 });
@@ -40,14 +40,55 @@ namespace Spending.Api.DataAccess
             }
         }
 
+        public async Task<bool> UpdatePatternAsync(int id, string pattern, int categoryId, int userId)
+        {
+            try
+            {
+                _spendingContext.TransactionCategoryPattern.Update(new TransactionCategoryPattern
+                {
+                    Id = id,
+                    Pattern = pattern,
+                    CategoryId = categoryId,
+                    UserId = userId
+                });
+                await _spendingContext.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+        }
+
+        public async Task<bool> DeletePatternAsync(int id)
+        {
+            try
+            {
+                _spendingContext.TransactionCategoryPattern.Remove(new TransactionCategoryPattern
+                {
+                    Id = id
+                });
+                await _spendingContext.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+        }
+
         public async Task<IList<TransactionCategoryPattern>> GetAllPatternsAsync(int userId)
         {
             try
             {
-                var patterns = _spendingContext.TransactionCategoryPattern
+                var patterns = await _spendingContext.TransactionCategoryPattern
                     .Include(pattern => pattern.Category)
                     .Where(pattern => pattern.UserId == userId)
-                    .ToList();
+                    .ToListAsync();
 
                 return patterns;
             }

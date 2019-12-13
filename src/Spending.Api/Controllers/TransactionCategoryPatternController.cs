@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Spending.Api.Models;
 using Spending.Api.Services;
 
 namespace Spending.Api.Controllers
@@ -16,14 +17,34 @@ namespace Spending.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SavePatternAsync(string descriptionContent, int categoryId, int userId)
+        public async Task<IActionResult> SavePatternAsync([FromBody]TransactionCategoryPattern transactionCategoryPattern, int  userId)
         {
-            var isSuccess = await _transactionCategoryPatternService.SavePatternAsync(descriptionContent, categoryId, userId);
+            var isSuccess = await _transactionCategoryPatternService.SavePatternAsync(
+                transactionCategoryPattern.Pattern, 
+                transactionCategoryPattern.CategoryId, 
+                userId);
 
-            return Ok(new
-            {
-                IsSuccess = isSuccess
-            });
+            return Ok(isSuccess);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdatePatternAsync([FromBody]TransactionCategoryPattern transactionCategoryPattern, int userId)
+        {
+            var isSuccess = await _transactionCategoryPatternService.UpdatePatternAsync(
+                 transactionCategoryPattern.Id,
+                 transactionCategoryPattern.Pattern, 
+                 transactionCategoryPattern.CategoryId, 
+                 userId);
+
+            return Ok(isSuccess);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeletePatternAsync(int transactionCategoryPatternId)
+        {
+            var isSuccess = await _transactionCategoryPatternService.DeletePatternAsync(transactionCategoryPatternId);
+
+            return Ok(isSuccess);
         }
 
         [HttpGet]
