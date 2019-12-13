@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Spending.Database.Entities;
+using Spending.Api.Models;
 
-namespace Spending.Api.DataAccess
+namespace Spending.Api.Services
 {
-    public interface ITransactionCategoryPatternDatabaseDataAccess
+    public interface ITransactionCategoryPatternService
     {
         Task<bool> SavePatternAsync(string descriptionContent, int categoryId, int userId);
         Task<IList<TransactionCategoryPattern>> GetAllPatternsAsync(int userId);

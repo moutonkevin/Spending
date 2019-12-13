@@ -7,5 +7,6 @@ namespace Spending.Api.DataAccess
     public interface ITransactionDataAccess
     {
         Task<bool> SaveAsync(IEnumerable<Transaction> transactions);
+        Task<IEnumerable<Transaction>> GetUncategorizedTransactions(int userId);
     }
 }

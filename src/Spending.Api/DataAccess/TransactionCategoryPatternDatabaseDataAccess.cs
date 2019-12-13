@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Spending.Database.Context;
@@ -21,23 +20,7 @@ namespace Spending.Api.DataAccess
             _spendingContext = spendingContext;
         }
 
-        public async Task<IEnumerable<Transaction>> GetUncategorizedTransactions(int userId)
-        {
-            try
-            {
-                return _spendingContext.Transaction
-                    .FromSqlRaw("EXEC dbo.sp_getTransactionsWithoutCategory @userId", new SqlParameter("userId", userId))
-                    .ToList();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-
-            return default;
-        }
-
-        public async Task<bool> SaveTransactionCategoryPattern(Transaction transaction, string descriptionContent, int categoryId, int userId)
+        public async Task<bool> SavePatternAsync(string descriptionContent, int categoryId, int userId)
         {
             try
             {
@@ -54,6 +37,24 @@ namespace Spending.Api.DataAccess
             {
                 Console.WriteLine(e);
                 return false;
+            }
+        }
+
+        public async Task<IList<TransactionCategoryPattern>> GetAllPatternsAsync(int userId)
+        {
+            try
+            {
+                var patterns = _spendingContext.TransactionCategoryPattern
+                    .Include(pattern => pattern.Category)
+                    .Where(pattern => pattern.UserId == userId)
+                    .ToList();
+
+                return patterns;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
             }
         }
     }

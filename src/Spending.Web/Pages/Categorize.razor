@@ -47,7 +47,7 @@
 
     async Task<IList<Transaction>> GetUncategorizedTransactions()
     {
-        var response = await Http.GetAsync($"{apiRootUrl}/TransactionCategory?userId={_userIdSelected}");
+        var response = await Http.GetAsync($"{apiRootUrl}/transaction?userId={_userIdSelected}");
         var responseContent = await response.Content.ReadAsStringAsync();
         return JsonConvert.DeserializeObject<IList<Transaction>>(responseContent).OrderBy(t => t.Description).ToList();
     }

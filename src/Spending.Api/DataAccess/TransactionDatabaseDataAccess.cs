@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Spending.Database.Context;
@@ -44,9 +45,20 @@ namespace Spending.Api.DataAccess
             }
         }
 
-        public async Task<IEnumerable<Transaction>> GetTransactionsWithoutCategoryAsync(int userId)
+        public async Task<IEnumerable<Transaction>> GetUncategorizedTransactions(int userId)
         {
-            return null;
+            try
+            {
+                return await _spendingContext.Transaction
+                    .FromSqlRaw("EXEC dbo.sp_getTransactionsWithoutCategory @userId", new SqlParameter("userId", userId))
+                    .ToListAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            return default;
         }
     }
 }

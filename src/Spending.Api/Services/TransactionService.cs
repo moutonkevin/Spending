@@ -104,9 +104,9 @@ namespace Spending.Api.Services
             return combinedTransactions;
         }
 
-        public async Task<IEnumerable<Transaction>> GetTransactionsWithoutCategory(int userId)
+        public async Task<IEnumerable<Transaction>> GetUncategorizedTransactions(int userId)
         {
-            return null;
+            return await _transactionDataAccess.GetUncategorizedTransactions(userId);
         }
     }
 }

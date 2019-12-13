@@ -42,7 +42,7 @@ namespace Spending.Api
 
             services.AddScoped<IFormFileService, FormFileService>();
             services.AddScoped<ITransactionService, TransactionService>();
-            services.AddScoped<ITransactionCategoryService, TransactionCategoryService>();
+            services.AddScoped<ITransactionCategoryPatternService, TransactionCategoryPatternService>();
 
             #region Extractors
 
