@@ -8,7 +8,7 @@ namespace Spending.Api.DataAccess
     {
         Task<bool> SaveAsync(IEnumerable<Transaction> transactions);
         Task<IEnumerable<Transaction>> GetUncategorizedTransactions(int userId);
-        Task<IEnumerable<Transaction>> GetAllTransactions(int userId);
+        Task<IEnumerable<Transaction>> GetAllTransactions(int userId, int? bankId, int? accountId, int? categoryId);
         Task<IEnumerable<Transaction>> GetTransactionsSatisfyingPattern(int userId, int patternId);
     }
 }

@@ -9,6 +9,6 @@ namespace Spending.Api.Services
     {
         Task<IEnumerable<Spending.Database.Entities.Transaction>> SaveAsync(StatementMetadata statementMetadata, IFormFileCollection files);
         Task<IEnumerable<Transaction>> GetUncategorizedTransactions(int userId);
-        Task<IEnumerable<Transaction>> GetAllTransactions(int userId);
+        Task<IEnumerable<Transaction>> GetAllTransactions(int userId, int? bankId, int? accountId, int? categoryId);
     }
 }

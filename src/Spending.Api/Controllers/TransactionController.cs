@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Spending.Api.Models;
 using Spending.Api.Services;
 
 namespace Spending.Api.Controllers
@@ -27,11 +29,11 @@ namespace Spending.Api.Controllers
 
         [HttpGet]
         [Route("GetAllTransactions")]
-        public async Task<IActionResult> GetAllTransactions(int userId)
+        public async Task<IActionResult> GetAllTransactions([FromQuery]GetTransactionsRequest request)
         {
-            var transactions = await _transactionService.GetAllTransactions(userId);
+            var transactions = await _transactionService.GetAllTransactions(request.UserId, request.BankId, request.AccountId, request.CategoryId);
 
-            return Ok(transactions.ToList());
+            return Ok(transactions);
         }
     }
 }

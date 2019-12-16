@@ -40,40 +40,47 @@
 }
 
 @code {
-    private void SetBankId(int id)
+    private async Task SetBankId(int id)
     {
         _bankIdSelected = id;
+        await SetTransactions();
     }
 
-    private void SetAccountId(int id)
+    private async Task SetAccountId(int id)
     {
         _accountIdSelected = id;
+        await SetTransactions();
     }
 
-    private void SetUserId(int id)
+    private async Task SetUserId(int id)
     {
         _userIdSelected = id;
+        await SetTransactions();
     }
 
-    private void SetCategoryId(int id)
+    private async Task SetCategoryId(int id)
     {
-        _categoryId = id;
+        _categoryIdSelected = id;
+        await SetTransactions();
     }
 
-    int _bankIdSelected;
-    int _accountIdSelected;
     int _userIdSelected;
-    int _categoryId;
+    int? _bankIdSelected = null;
+    int? _accountIdSelected = null;
+    int? _categoryIdSelected = null;
     IList<Transaction> _transactions = null;
 
-    async Task<IList<Transaction>> GetTransactions()
+    async Task SetTransactions()
     {
-        return await Http.GetJsonAsync<IList<Transaction>>($"{ConfigOptions.Value.ApiBaseUrl}/transaction/GetAllTransactions?userId={_userIdSelected}");
+        _transactions = await Http.GetJsonAsync<IList<Transaction>>($"{ConfigOptions.Value.ApiBaseUrl}/transaction/GetAllTransactions" +
+                                                           $"?userId={_userIdSelected}" +
+                                                           $"&bankId={_bankIdSelected}" +
+                                                           $"&accountId={_accountIdSelected}" +
+                                                           $"&categoryId={_categoryIdSelected}");
     }
 
     protected override async Task OnInitializedAsync()
     {
-        SetUserId(1);
-        _transactions = await GetTransactions();
+        await SetUserId(1);
     }
 }

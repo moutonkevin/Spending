@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -61,16 +62,27 @@ namespace Spending.Api.DataAccess
             return default;
         }
 
-        public async Task<IEnumerable<Transaction>> GetAllTransactions(int userId)
+        private IQueryable<Transaction> AddToWhereClauseIfNonDefault(IQueryable<Transaction> query, Expression<Func<Transaction, bool>> expression, int? value)
+        {
+            return value.HasValue && value.Value >= 0 ? query.Where(expression) : query;
+        }
+
+        public async Task<IEnumerable<Transaction>> GetAllTransactions(int userId, int? bankId, int? accountId, int? categoryId)
         {
             try
             {
-                return await _spendingContext.Transaction
+                var query = _spendingContext.Transaction
                     .Include(t => t.TransactionType)
+                    .Include(t => t.Account)
                     .Include(i => i.TransactionCategory)
                     .ThenInclude(ii => ii.Category)
-                    .Where(t => t.UserId == userId)
-                    .ToListAsync();
+                    .Where(t => t.UserId == userId);
+
+                query = AddToWhereClauseIfNonDefault(query, transaction => transaction.AccountId == accountId, accountId);
+                query = AddToWhereClauseIfNonDefault(query, transaction => transaction.TransactionCategory.CategoryId == categoryId, categoryId);
+                query = AddToWhereClauseIfNonDefault(query, transaction => transaction.Account.BankId == bankId, bankId);
+
+                return await query.ToListAsync();
             }
             catch (Exception e)
             {

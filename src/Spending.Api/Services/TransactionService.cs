@@ -118,9 +118,9 @@ namespace Spending.Api.Services
             }).OrderBy(o => o.Description);
         }
 
-        public async Task<IEnumerable<Transaction>> GetAllTransactions(int userId)
+        public async Task<IEnumerable<Transaction>> GetAllTransactions(int userId, int? bankId, int? accountId, int? categoryId)
         {
-            var transactions = await _transactionDataAccess.GetAllTransactions(userId);
+            var transactions = await _transactionDataAccess.GetAllTransactions(userId, bankId, accountId, categoryId);
 
             return transactions.Select(s => new Transaction
             {

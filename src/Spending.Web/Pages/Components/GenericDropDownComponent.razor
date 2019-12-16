@@ -25,4 +25,10 @@
             Source.Insert(0, new GenericDropDown {Id = -1, DisplayName = "All"});
         }
     }
+
+    //prevent the reset of the selected value when the UI refreshes
+    protected override bool ShouldRender()
+    {
+        return false;
+    }
 }
