@@ -5,7 +5,6 @@
 @using Newtonsoft.Json
 @using Spending.Api.Models
 @using Spending.Database
-@using Spending.Database.Entities
 @using Spending.Web.Data
 @inject HttpClient Http
 @using  Spending.Web.Pages.Components
@@ -15,7 +14,7 @@
         <GenericDropDownComponent Source="@Constants.Banks.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetBankId" />
         <GenericDropDownComponent Source="@Constants.Accounts.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetAccountId" />
         <GenericDropDownComponent Source="@Constants.Users.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetUserId" />
-        <GenericDropDownComponent Source="@(new List<GenericDropDown> {new GenericDropDown {Id = 1, DisplayName = Api.Constants.Csv}, new GenericDropDown {Id = 2, DisplayName = Api.Constants.Pdf}})" SetSelectedId="@SetFileTypeId" />
+        <GenericDropDownComponent Source="@(new List<GenericDropDown> {new GenericDropDown {Id = Api.Constants.CsvFile.Id, DisplayName = Api.Constants.CsvFile.Type}, new GenericDropDown {Id = Api.Constants.PdFile.Id, DisplayName = Api.Constants.PdFile.Type}})" SetSelectedId="@SetFileTypeId" />
 
         <InputFile multiple OnChange="HandleFileSelected" />
     </div>
@@ -39,33 +38,13 @@
 
     private void SetFileTypeId(int id)
     {
-        _fileTypeIdSelected = id; Send ID instead of stringf
+        _fileTypeIdSelected = id;
     }
 
     int _bankIdSelected;
     int _accountIdSelected;
     int _userIdSelected;
-    string _fileTypeIdSelected;
-
-    readonly List<Bank> _banks = new List<Bank>()
-{
-        new Bank { Id = 1, Name = "Commonwealth Bank" },
-        new Bank { Id = 2, Name = "American Express" },
-        new Bank { Id = 3, Name = "CityBank" },
-        new Bank { Id = 4, Name = "Westpac" },
-        new Bank { Id = 5, Name = "Qantas" }
-    };
-
-    readonly List<Account> _accounts = new List<Account>()
-{
-        new Account { Id = 1, Name = "Smart Access", BankId = 1}
-    };
-
-
-    readonly List<User> _users = new List<User>()
-{
-        new User { Id = 1, Name = "Kevin" }
-    };
+    int _fileTypeIdSelected;
 
     HttpContent FormatFileContent(byte[] stream, string contentType, string contentDispositionName, string fileName)
     {
@@ -97,13 +76,13 @@
         try
         {
             var content = new MultipartFormDataContent
-{
+            {
                 FormatDataContent(JsonConvert.SerializeObject(new StatementMetadata
                 {
                     BankId = _bankIdSelected,
                     AccountId = _accountIdSelected,
                     UserId = _userIdSelected,
-                    StatementFileType = _fileTypeIdSelected
+                    StatementFileTypeId = _fileTypeIdSelected
                 }), "application/json", "statementMetadata")
             };
 
@@ -112,9 +91,11 @@
                 var ms = new MemoryStream();
                 await file.Data.CopyToAsync(ms);
 
-                content.Add(FormatFileContent(ms.GetBuffer(), "text/csv", "statementFile", file.Name));
+                var mediaType = Api.Constants.FileTypes.FirstOrDefault(f => f.Id == _fileTypeIdSelected).MediaType;
+
+                content.Add(FormatFileContent(ms.GetBuffer(), mediaType, "statementFile", file.Name));
             }
-            var transactions = await Http.PostJsonAsync<IList<Spending.Database.Entities.Transaction>>($"{ConfigsOptions.Value.ApiBaseUrl}/statement", content);
+            var transactions = await Http.PostAsync($"{ConfigsOptions.Value.ApiBaseUrl}/statement", content);
         }
         catch (Exception e)
         {
@@ -125,9 +106,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _bankIdSelected = _banks.FirstOrDefault().Id;
-        _accountIdSelected = _accounts.FirstOrDefault().Id;
-        _userIdSelected = _users.FirstOrDefault().Id;
-        _fileTypeIdSelected = "csv";
+        _bankIdSelected = Constants.Banks.List.FirstOrDefault().Id;
+        _accountIdSelected = Constants.Accounts.List.FirstOrDefault().Id;
+        _userIdSelected = Constants.Users.List.FirstOrDefault().Id;
+        _fileTypeIdSelected = Api.Constants.CsvFile.Id;
     }
 }

@@ -15,15 +15,15 @@ namespace Spending.Api.Services
     {
         private readonly ILogger<TransactionService> _logger;
         private readonly IFormFileService _formFileService;
-        private readonly Func<string, string, IParserService> _parserServiceResolver;
-        private readonly Func<string, ITextExtractorService> _textExtractorResolver;
+        private readonly Func<string, int, IParserService> _parserServiceResolver;
+        private readonly Func<int, ITextExtractorService> _textExtractorResolver;
         private readonly ITransactionDataAccess _transactionDataAccess;
 
         public TransactionService(
             ILogger<TransactionService> logger,
             IFormFileService formFileService,
-            Func<string, string, IParserService> parserServiceResolver,
-            Func<string, ITextExtractorService> textExtractorResolver,
+            Func<string, int, IParserService> parserServiceResolver,
+            Func<int, ITextExtractorService> textExtractorResolver,
             ITransactionDataAccess transactionDataAccess)
         {
             _logger = logger;
@@ -33,16 +33,16 @@ namespace Spending.Api.Services
             _transactionDataAccess = transactionDataAccess;
         }
 
-        private IParserService GetParserService(int bankId, string fileType)
+        private IParserService GetParserService(int bankId, int fileTypeId)
         {
             var bankName = Database.Constants.Banks.List.FirstOrDefault(b => b.Id == bankId)?.Name;
 
-            return _parserServiceResolver.Invoke(bankName, fileType);
+            return _parserServiceResolver.Invoke(bankName, fileTypeId);
         }
 
-        private ITextExtractorService GetExtractorServiceForFileType(string fileType)
+        private ITextExtractorService GetExtractorServiceForFileType(int fileTypeId)
         {
-            return _textExtractorResolver.Invoke(fileType);
+            return _textExtractorResolver.Invoke(fileTypeId);
         }
 
         private void ConsolidateTransactions(StatementMetadata statementMetadata, IEnumerable<Spending.Database.Entities.Transaction> transactions)
@@ -81,8 +81,8 @@ namespace Spending.Api.Services
 
         public async Task<IEnumerable<Spending.Database.Entities.Transaction>> SaveAsync(StatementMetadata statementMetadata, IFormFileCollection files)
         {
-            var parserService = GetParserService(statementMetadata.BankId, statementMetadata.StatementFileType);
-            var extractorService = GetExtractorServiceForFileType(statementMetadata.StatementFileType);
+            var parserService = GetParserService(statementMetadata.BankId, statementMetadata.StatementFileTypeId);
+            var extractorService = GetExtractorServiceForFileType(statementMetadata.StatementFileTypeId);
 
             var combinedTransactions = new List<Spending.Database.Entities.Transaction>();
 

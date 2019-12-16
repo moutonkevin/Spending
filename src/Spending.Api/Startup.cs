@@ -15,7 +15,6 @@ using Spending.Api.Services.Parsers;
 using Spending.Api.Services.Parsers.Csv;
 using Spending.Api.Services.Parsers.Pdf;
 using Spending.Database.Context;
-using Spending.Database.Entities;
 
 namespace Spending.Api
 {
@@ -50,13 +49,13 @@ namespace Spending.Api
             services.AddScoped<TextSharpPdfTextExtractorService>();
             services.AddScoped<CsvTextExtractorService>();
 
-            services.AddScoped<Func<string, ITextExtractorService>>(serviceProvider => key =>
+            services.AddScoped<Func<int, ITextExtractorService>>(serviceProvider => fileTypeId =>
             {
-                if (key.Equals(Constants.Pdf))
+                if (fileTypeId == Constants.PdFile.Id)
                 {
                     return serviceProvider.GetService<TextSharpPdfTextExtractorService>();
                 }
-                else if (key.Equals(Constants.Csv))
+                else if (fileTypeId == Constants.CsvFile.Id)
                 {
                     return serviceProvider.GetService<CsvTextExtractorService>();
                 }
@@ -76,51 +75,51 @@ namespace Spending.Api
             services.AddScoped<AmexCsvParserService>();
             services.AddScoped<QantasMoneyCsvParserService>();
             
-            services.AddScoped<Func<string, string, IParserService>>(serviceProvider => (bankKey, fileTypeKey) =>
+            services.AddScoped<Func<string, int, IParserService>>(serviceProvider => (bankKey, fileTypeId) =>
             {
                 if (bankKey.Equals(Database.Constants.Banks.List.FirstOrDefault(b => b.Id == 1)))
                 {
-                    if (fileTypeKey.Equals(Constants.Pdf))
+                    if (fileTypeId == Constants.PdFile.Id)
                     {
                         return serviceProvider.GetService<CommonwealthBankPdfParserService>();
                     }
-                    else if (fileTypeKey.Equals(Constants.Csv))
+                    else if (fileTypeId == Constants.CsvFile.Id)
                     {
                         return serviceProvider.GetService<CommonwealthBankCsvParserService>();
                     }
                     else
                     {
-                        throw new KeyNotFoundException(fileTypeKey);
+                        throw new KeyNotFoundException(fileTypeId.ToString());
                     }
                 }
                 else if (bankKey.Equals(Database.Constants.Banks.List.FirstOrDefault(b => b.Id == 2)))
                 {
-                    if (fileTypeKey.Equals(Constants.Pdf))
+                    if (fileTypeId == Constants.PdFile.Id)
                     {
                         return serviceProvider.GetService<AmexPdfParserService>();
                     }
-                    else if (fileTypeKey.Equals(Constants.Csv))
+                    else if (fileTypeId == Constants.CsvFile.Id)
                     {
                         return serviceProvider.GetService<AmexCsvParserService>();
                     }
                     else
                     {
-                        throw new KeyNotFoundException(fileTypeKey);
+                        throw new KeyNotFoundException(fileTypeId.ToString());
                     }
                 }
                 else if (bankKey.Equals(Database.Constants.Banks.List.FirstOrDefault(b => b.Id == 5)))
                 {
-                    if (fileTypeKey.Equals(Constants.Pdf))
+                    if (fileTypeId == Constants.PdFile.Id)
                     {
-                        throw new KeyNotFoundException(fileTypeKey);
+                        throw new KeyNotFoundException(fileTypeId.ToString());
                     }
-                    else if (fileTypeKey.Equals(Constants.Csv))
+                    else if (fileTypeId == Constants.CsvFile.Id)
                     {
                         return serviceProvider.GetService<QantasMoneyCsvParserService>();
                     }
                     else
                     {
-                        throw new KeyNotFoundException(fileTypeKey);
+                        throw new KeyNotFoundException(fileTypeId.ToString());
                     }
                 }
                 else
