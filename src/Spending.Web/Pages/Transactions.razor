@@ -1,0 +1,79 @@
+﻿@page "/transactions"
+@using Microsoft.Extensions.Options
+@using Spending.Api.Models
+@using Spending.Database
+@using Spending.Web.Data
+@using  Spending.Web.Pages.Components
+@inject HttpClient Http
+@inject IOptions<Configuration> ConfigOptions
+
+<h3>Transactions</h3>
+
+<GenericDropDownComponent Source="@Constants.Users.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetUserId" />
+<GenericDropDownComponent Source="@Constants.Banks.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetBankId" AddAll="@true" SelectedId="-1" />
+<GenericDropDownComponent Source="@Constants.Accounts.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetAccountId" AddAll="@true" SelectedId="-1"/>
+<GenericDropDownComponent Source="@Constants.Categories.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetCategoryId" AddAll="@true" SelectedId="-1"/>
+
+@if (_transactions != null)
+{
+    <div>
+        <table style="width:100%">
+            <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Category</th>
+            </tr>
+            @foreach (var transaction in _transactions)
+            {
+                <tr>
+                    <td>@transaction.Date</td>
+                    <td>@transaction.Amount</td>
+                    <td>@transaction.TransactionTypeName</td>
+                    <td>@transaction.Description</td>
+                    <td>@transaction.CategoryName</td>
+                </tr>
+            }
+        </table>
+    </div>
+}
+
+@code {
+    private void SetBankId(int id)
+    {
+        _bankIdSelected = id;
+    }
+
+    private void SetAccountId(int id)
+    {
+        _accountIdSelected = id;
+    }
+
+    private void SetUserId(int id)
+    {
+        _userIdSelected = id;
+    }
+
+    private void SetCategoryId(int id)
+    {
+        _categoryId = id;
+    }
+
+    int _bankIdSelected;
+    int _accountIdSelected;
+    int _userIdSelected;
+    int _categoryId;
+    IList<Transaction> _transactions = null;
+
+    async Task<IList<Transaction>> GetTransactions()
+    {
+        return await Http.GetJsonAsync<IList<Transaction>>($"{ConfigOptions.Value.ApiBaseUrl}/transaction/GetAllTransactions?userId={_userIdSelected}");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        SetUserId(1);
+        _transactions = await GetTransactions();
+    }
+}

@@ -8,6 +8,7 @@ namespace Spending.Api.Services
     public interface ITransactionService
     {
         Task<IEnumerable<Spending.Database.Entities.Transaction>> SaveAsync(StatementMetadata statementMetadata, IFormFileCollection files);
-        Task<IEnumerable<Spending.Api.Models.Transaction>> GetUncategorizedTransactions(int userId);
+        Task<IEnumerable<Transaction>> GetUncategorizedTransactions(int userId);
+        Task<IEnumerable<Transaction>> GetAllTransactions(int userId);
     }
 }

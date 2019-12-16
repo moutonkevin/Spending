@@ -1,13 +1,15 @@
 ﻿@page "/transactioncategorypattern"
 @using Microsoft.Extensions.Options
 @using Newtonsoft.Json
+@using Spending.Web.Data
 @inject HttpClient Http
 @inject IOptions<Configuration> ConfigOptions
 @using Spending.Web.Pages.Components
+@using Spending.Database
 
 <h1>User Patterns</h1>
 
-<UserDropDownComponent SetUserId="@SetUserId" />
+<GenericDropDownComponent Source="@Constants.Users.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetUserId" />
 
 @if (_transactionsCategoryPatterns != null)
 {

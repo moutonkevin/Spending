@@ -132,6 +132,7 @@ namespace Spending.Api
 
             services.AddScoped<ITransactionDataAccess, TransactionDatabaseDataAccess>();
             services.AddScoped<ITransactionCategoryPatternDatabaseDataAccess, TransactionCategoryPatternDatabaseDataAccess>();
+            services.AddScoped<ITransactionCategoryDatabaseDataAccess, TransactionCategoryDatabaseDataAccess>();
 
             services
                 .AddDbContext<SpendingContext>(options =>

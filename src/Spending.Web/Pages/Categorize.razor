@@ -1,13 +1,15 @@
 ﻿@page "/categorize"
 @using Microsoft.Extensions.Options
 @using Spending.Api.Models
+@using Spending.Database
+@using Spending.Web.Data
 @inject HttpClient Http
 @inject IOptions<Configuration> ConfigOptions
 @using Spending.Web.Pages.Components
 
 <h1>Categorize</h1>
 
-<UserDropDownComponent SetUserId="@SetUserId" />
+<GenericDropDownComponent Source="@Constants.Users.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetUserId" />
 
 @if (_transactions != null)
 {
@@ -47,7 +49,7 @@
 
     async Task<IList<Transaction>> GetUncategorizedTransactions()
     {
-        return await Http.GetJsonAsync<IList<Transaction>>($"{ConfigOptions.Value.ApiBaseUrl}/transaction?userId={_userIdSelected}");
+        return await Http.GetJsonAsync<IList<Transaction>>($"{ConfigOptions.Value.ApiBaseUrl}/transaction/GetUncategorizedTransactions?userId={_userIdSelected}");
     }
 
     async Task SaveTransactionCategory(Transaction transaction)

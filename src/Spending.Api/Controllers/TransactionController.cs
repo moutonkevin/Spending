@@ -17,11 +17,21 @@ namespace Spending.Api.Controllers
         }
 
         [HttpGet]
+        [Route("GetUncategorizedTransactions")]
         public async Task<IActionResult> GetUncategorizedTransactions(int userId)
         {
             var uncategorizedTransactions = await _transactionService.GetUncategorizedTransactions(userId);
 
             return Ok(uncategorizedTransactions.ToList());
+        }
+
+        [HttpGet]
+        [Route("GetAllTransactions")]
+        public async Task<IActionResult> GetAllTransactions(int userId)
+        {
+            var transactions = await _transactionService.GetAllTransactions(userId);
+
+            return Ok(transactions.ToList());
         }
     }
 }

@@ -12,5 +12,6 @@
         public TransactionType TransactionType { get; set; }
         public int UserId { get; set; }
         public User User { get; set; }
+        public TransactionCategory TransactionCategory { get; set; }
     }
 }

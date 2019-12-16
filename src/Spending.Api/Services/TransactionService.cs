@@ -103,11 +103,11 @@ namespace Spending.Api.Services
             return combinedTransactions;
         }
 
-        public async Task<IEnumerable<Spending.Api.Models.Transaction>> GetUncategorizedTransactions(int userId)
+        public async Task<IEnumerable<Transaction>> GetUncategorizedTransactions(int userId)
         {
             var uncategorizedTransactions = await _transactionDataAccess.GetUncategorizedTransactions(userId);
 
-            return uncategorizedTransactions.Select(s => new Spending.Api.Models.Transaction
+            return uncategorizedTransactions.Select(s => new Transaction
             {
                 Description = s.Description,
                 Id = s.Id,
@@ -115,6 +115,21 @@ namespace Spending.Api.Services
                 Date = s.Date,
                 TransactionTypeId = s.TransactionTypeId,
                 CategoryId = Database.Constants.Categories.List.First().Id
+            }).OrderBy(o => o.Description);
+        }
+
+        public async Task<IEnumerable<Transaction>> GetAllTransactions(int userId)
+        {
+            var transactions = await _transactionDataAccess.GetAllTransactions(userId);
+
+            return transactions.Select(s => new Transaction
+            {
+                Description = s.Description,
+                Id = s.Id,
+                Amount = s.Amount,
+                Date = s.Date,
+                TransactionTypeName = s.TransactionType?.Name,
+                CategoryName = s.TransactionCategory?.Category?.Name
             }).OrderBy(o => o.Description);
         }
     }

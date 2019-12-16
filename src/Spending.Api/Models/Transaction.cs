@@ -7,6 +7,8 @@
         public string Description { get; set; }
         public string Date { get; set; }
         public int TransactionTypeId { get; set; }
+        public string TransactionTypeName { get; set; }
         public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
     }
 }

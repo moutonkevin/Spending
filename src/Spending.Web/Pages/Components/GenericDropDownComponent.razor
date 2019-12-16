@@ -10,10 +10,19 @@
 @code {
 
     [Parameter] public int SelectedId { get; set; }
-    [Parameter] public IReadOnlyList<GenericDropDown> Source { get; set; }
+    [Parameter] public IList<GenericDropDown> Source { get; set; }
     [Parameter] public EventCallback<int> SetSelectedId { get; set; }
+    [Parameter] public bool AddAll { get; set; }
 
     public async Task OnChanged(ChangeEventArgs e) => await SetSelectedId.InvokeAsync(int.Parse((string)e.Value));
 
     public bool IsSelected(GenericDropDown item) => item.Id == SelectedId;
+
+    protected override void OnInitialized()
+    {
+        if (AddAll)
+        {
+            Source.Insert(0, new GenericDropDown {Id = -1, DisplayName = "All"});
+        }
+    }
 }

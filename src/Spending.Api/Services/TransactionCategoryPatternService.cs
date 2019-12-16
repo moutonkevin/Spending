@@ -9,15 +9,28 @@ namespace Spending.Api.Services
     public class TransactionCategoryPatternService : ITransactionCategoryPatternService
     {
         private readonly ITransactionCategoryPatternDatabaseDataAccess _dataAccess;
+        private readonly ITransactionDataAccess _transactionDataAccess;
+        private readonly ITransactionCategoryDatabaseDataAccess _transactionCategoryDatabaseDataAccess;
 
-        public TransactionCategoryPatternService(ITransactionCategoryPatternDatabaseDataAccess dataAccess)
+        public TransactionCategoryPatternService(ITransactionCategoryPatternDatabaseDataAccess dataAccess,
+            ITransactionDataAccess transactionDataAccess,
+            ITransactionCategoryDatabaseDataAccess transactionCategoryDatabaseDataAccess)
         {
             _dataAccess = dataAccess;
+            _transactionDataAccess = transactionDataAccess;
+            _transactionCategoryDatabaseDataAccess = transactionCategoryDatabaseDataAccess;
         }
 
         public async Task<bool> SavePatternAsync(string pattern, int categoryId, int userId)
         {
-            return await _dataAccess.SavePatternAsync(pattern, categoryId, userId);
+            var patternId = await _dataAccess.SavePatternAsync(pattern, categoryId, userId);
+            if (patternId == null)
+                return false;
+
+            var transactions = await _transactionDataAccess.GetTransactionsSatisfyingPattern(userId, patternId.Value);
+            var areCategoriesSaved = await _transactionCategoryDatabaseDataAccess.SaveTransactionCategories(transactions, categoryId);
+
+            return areCategoriesSaved;
         }
 
         public async Task<bool> UpdatePatternAsync(int id, string pattern, int categoryId, int userId)

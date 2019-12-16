@@ -60,5 +60,42 @@ namespace Spending.Api.DataAccess
 
             return default;
         }
+
+        public async Task<IEnumerable<Transaction>> GetAllTransactions(int userId)
+        {
+            try
+            {
+                return await _spendingContext.Transaction
+                    .Include(t => t.TransactionType)
+                    .Include(i => i.TransactionCategory)
+                    .ThenInclude(ii => ii.Category)
+                    .Where(t => t.UserId == userId)
+                    .ToListAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            return default;
+        }
+
+        public async Task<IEnumerable<Transaction>> GetTransactionsSatisfyingPattern(int userId, int patternId)
+        {
+            try
+            {
+                return await _spendingContext.Transaction
+                    .FromSqlRaw("EXEC dbo.sp_getTransactionsSatisfyingCategoryPattern @userId, @transactionCategoryPatternId",
+                        new SqlParameter("userId", userId),
+                        new SqlParameter("transactionCategoryPatternId", patternId))
+                    .ToListAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            return default;
+        }
     }
 }

@@ -20,23 +20,26 @@ namespace Spending.Api.DataAccess
             _spendingContext = spendingContext;
         }
 
-        public async Task<bool> SavePatternAsync(string pattern, int categoryId, int userId)
+        public async Task<int?> SavePatternAsync(string pattern, int categoryId, int userId)
         {
             try
             {
-                await _spendingContext.TransactionCategoryPattern.AddAsync(new TransactionCategoryPattern
+                var transactionCategoryPattern = new TransactionCategoryPattern
                 {
                     Pattern = pattern,
                     CategoryId = categoryId,
                     UserId = userId
-                });
+                };
+
+                await _spendingContext.TransactionCategoryPattern.AddAsync(transactionCategoryPattern);
                 await _spendingContext.SaveChangesAsync();
-                return true;
+
+                return transactionCategoryPattern.Id;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return false;
+                return null;
             }
         }
 
