@@ -1,0 +1,25 @@
+﻿@using Spending.Web.Data
+
+<div>
+    <input type="text" @bind="_text"/>
+    <button @onclick="OnClicked">Search</button>
+</div>
+
+@code {
+
+    private string _text;
+
+    [Parameter] public EventCallback<string> SetText { get; set; }
+
+    public async Task OnClicked() => await SetText.InvokeAsync(_text);
+
+    protected override void OnInitialized()
+    {
+    }
+
+    //prevent the reset of the selected value when the UI refreshes
+    protected override bool ShouldRender()
+    {
+        return false;
+    }
+}

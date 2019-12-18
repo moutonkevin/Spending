@@ -59,13 +59,13 @@
 
     async Task UpdateTransactionCategoryPattern(Spending.Api.Models.TransactionCategoryPattern transactionCategoryPattern)
     {
-        var isSuccess = await Http.PutJsonAsync<bool>($"{ConfigOptions.Value.ApiBaseUrl}/api/TransactionCategoryPattern?userId={_userIdSelected}",
+        var isSuccess = await Http.PutJsonAsync<bool>($"{ConfigOptions.Value.ApiBaseUrl}/TransactionCategoryPattern?userId={_userIdSelected}",
             transactionCategoryPattern);
     }
 
     async Task DeleteTransactionCategoryPattern(Spending.Api.Models.TransactionCategoryPattern transactionCategoryPattern)
     {
-        var response = await Http.DeleteAsync($"{ConfigOptions.Value.ApiBaseUrl}/api/TransactionCategoryPattern?transactionCategoryPatternId={transactionCategoryPattern.Id}");
+        var response = await Http.DeleteAsync($"{ConfigOptions.Value.ApiBaseUrl}/TransactionCategoryPattern?transactionCategoryPatternId={transactionCategoryPattern.Id}");
         var isSuccess = JsonConvert.DeserializeObject<bool>(await response.Content.ReadAsStringAsync());
 
         if (isSuccess)

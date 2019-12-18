@@ -49,7 +49,9 @@ namespace Spending.Database
                 new Category { Id = 12, Name = "Transfer Between Accounts" },
                 new Category { Id = 13, Name = "Salary" },
                 new Category { Id = 14, Name = "Transport" },
-                new Category { Id = 15, Name = "Lunch" }
+                new Category { Id = 15, Name = "Eating out" },
+                new Category { Id = 16, Name = "Haircut" },
+                new Category { Id = 17, Name = "Fees" }
             };
     }
 

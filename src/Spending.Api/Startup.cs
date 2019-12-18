@@ -75,9 +75,9 @@ namespace Spending.Api
             services.AddScoped<AmexCsvParserService>();
             services.AddScoped<QantasMoneyCsvParserService>();
             
-            services.AddScoped<Func<string, int, IParserService>>(serviceProvider => (bankKey, fileTypeId) =>
+            services.AddScoped<Func<int, int, IParserService>>(serviceProvider => (bankId, fileTypeId) =>
             {
-                if (bankKey.Equals(Database.Constants.Banks.List.FirstOrDefault(b => b.Id == 1)))
+                if (bankId == Database.Constants.Banks.List.FirstOrDefault(b => b.Id == 1).Id)
                 {
                     if (fileTypeId == Constants.PdFile.Id)
                     {
@@ -92,7 +92,7 @@ namespace Spending.Api
                         throw new KeyNotFoundException(fileTypeId.ToString());
                     }
                 }
-                else if (bankKey.Equals(Database.Constants.Banks.List.FirstOrDefault(b => b.Id == 2)))
+                else if (bankId == Database.Constants.Banks.List.FirstOrDefault(b => b.Id == 2).Id)
                 {
                     if (fileTypeId == Constants.PdFile.Id)
                     {
@@ -107,7 +107,7 @@ namespace Spending.Api
                         throw new KeyNotFoundException(fileTypeId.ToString());
                     }
                 }
-                else if (bankKey.Equals(Database.Constants.Banks.List.FirstOrDefault(b => b.Id == 5)))
+                else if (bankId == Database.Constants.Banks.List.FirstOrDefault(b => b.Id == 5).Id)
                 {
                     if (fileTypeId == Constants.PdFile.Id)
                     {
@@ -124,7 +124,7 @@ namespace Spending.Api
                 }
                 else
                 {
-                    throw new KeyNotFoundException(bankKey);
+                    throw new KeyNotFoundException(bankId.ToString());
                 }
             });
 

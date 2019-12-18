@@ -28,10 +28,10 @@
                 <tr>
                     <td>@transaction.Date</td>
                     <td>@transaction.Amount</td>
-                    <td>@transaction.TransactionTypeId</td>
+                    <td>@(Constants.TransactionTypes.List.FirstOrDefault(f => f.Id == transaction.TransactionTypeId).Name)</td>
                     <td>@transaction.Description</td>
                     <td>
-                        <CategoryDropDownComponent CategoryId="1" ExternalId="@transaction.Id" SetCategoryId="@SetCategoryId" />
+                        <CategoryDropDownComponent CategoryId="9" ExternalId="@transaction.Id" SetCategoryId="@SetCategoryId" />
                         <input type="text" @bind="@transaction.Description">
                         <button type="button" @onclick="@(e => SaveTransactionCategory(transaction))">Save</button>
                     </td>

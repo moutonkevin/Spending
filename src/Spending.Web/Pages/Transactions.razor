@@ -13,6 +13,7 @@
 <GenericDropDownComponent Source="@Constants.Banks.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetBankId" AddAll="@true" SelectedId="-1" />
 <GenericDropDownComponent Source="@Constants.Accounts.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetAccountId" AddAll="@true" SelectedId="-1"/>
 <GenericDropDownComponent Source="@Constants.Categories.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetCategoryId" AddAll="@true" SelectedId="-1"/>
+<FieldButtonComponent SetText="@SetText"/>
 
 @if (_transactions != null)
 {
@@ -64,10 +65,17 @@
         await SetTransactions();
     }
 
+    private async Task SetText(string text)
+    {
+        _text = text;
+        await SetTransactions();
+    }
+
     int _userIdSelected;
     int? _bankIdSelected = null;
     int? _accountIdSelected = null;
     int? _categoryIdSelected = null;
+    string _text = null;
     IList<Transaction> _transactions = null;
 
     async Task SetTransactions()
@@ -76,7 +84,8 @@
                                                            $"?userId={_userIdSelected}" +
                                                            $"&bankId={_bankIdSelected}" +
                                                            $"&accountId={_accountIdSelected}" +
-                                                           $"&categoryId={_categoryIdSelected}");
+                                                           $"&categoryId={_categoryIdSelected}" +
+                                                           $"&description={_text}");
     }
 
     protected override async Task OnInitializedAsync()

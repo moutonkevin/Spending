@@ -31,7 +31,12 @@ namespace Spending.Api.Controllers
         [Route("GetAllTransactions")]
         public async Task<IActionResult> GetAllTransactions([FromQuery]GetTransactionsRequest request)
         {
-            var transactions = await _transactionService.GetAllTransactions(request.UserId, request.BankId, request.AccountId, request.CategoryId);
+            var transactions = await _transactionService.GetAllTransactions(
+                request.UserId, 
+                request.BankId, 
+                request.AccountId, 
+                request.CategoryId, 
+                request.Description);
 
             return Ok(transactions);
         }

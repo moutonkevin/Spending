@@ -15,14 +15,14 @@ namespace Spending.Api.Services
     {
         private readonly ILogger<TransactionService> _logger;
         private readonly IFormFileService _formFileService;
-        private readonly Func<string, int, IParserService> _parserServiceResolver;
+        private readonly Func<int, int, IParserService> _parserServiceResolver;
         private readonly Func<int, ITextExtractorService> _textExtractorResolver;
         private readonly ITransactionDataAccess _transactionDataAccess;
 
         public TransactionService(
             ILogger<TransactionService> logger,
             IFormFileService formFileService,
-            Func<string, int, IParserService> parserServiceResolver,
+            Func<int, int, IParserService> parserServiceResolver,
             Func<int, ITextExtractorService> textExtractorResolver,
             ITransactionDataAccess transactionDataAccess)
         {
@@ -35,9 +35,7 @@ namespace Spending.Api.Services
 
         private IParserService GetParserService(int bankId, int fileTypeId)
         {
-            var bankName = Database.Constants.Banks.List.FirstOrDefault(b => b.Id == bankId)?.Name;
-
-            return _parserServiceResolver.Invoke(bankName, fileTypeId);
+            return _parserServiceResolver.Invoke(bankId, fileTypeId);
         }
 
         private ITextExtractorService GetExtractorServiceForFileType(int fileTypeId)
@@ -118,9 +116,9 @@ namespace Spending.Api.Services
             }).OrderBy(o => o.Description);
         }
 
-        public async Task<IEnumerable<Transaction>> GetAllTransactions(int userId, int? bankId, int? accountId, int? categoryId)
+        public async Task<IEnumerable<Transaction>> GetAllTransactions(int userId, int? bankId, int? accountId, int? categoryId, string description)
         {
-            var transactions = await _transactionDataAccess.GetAllTransactions(userId, bankId, accountId, categoryId);
+            var transactions = await _transactionDataAccess.GetAllTransactions(userId, bankId, accountId, categoryId, description);
 
             return transactions.Select(s => new Transaction
             {

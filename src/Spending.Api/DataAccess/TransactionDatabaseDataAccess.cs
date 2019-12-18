@@ -62,12 +62,17 @@ namespace Spending.Api.DataAccess
             return default;
         }
 
-        private IQueryable<Transaction> AddToWhereClauseIfNonDefault(IQueryable<Transaction> query, Expression<Func<Transaction, bool>> expression, int? value)
+        private IQueryable<Transaction> AddToWhereClauseIfNonDefaultInt(IQueryable<Transaction> query, Expression<Func<Transaction, bool>> expression, int? value)
         {
             return value.HasValue && value.Value >= 0 ? query.Where(expression) : query;
         }
 
-        public async Task<IEnumerable<Transaction>> GetAllTransactions(int userId, int? bankId, int? accountId, int? categoryId)
+        private IQueryable<Transaction> AddToWhereClauseIfNonDefaultString(IQueryable<Transaction> query, Expression<Func<Transaction, bool>> expression, string value)
+        {
+            return !string.IsNullOrWhiteSpace(value)  ? query.Where(expression) : query;
+        }
+
+        public async Task<IEnumerable<Transaction>> GetAllTransactions(int userId, int? bankId, int? accountId, int? categoryId, string description)
         {
             try
             {
@@ -78,9 +83,10 @@ namespace Spending.Api.DataAccess
                     .ThenInclude(ii => ii.Category)
                     .Where(t => t.UserId == userId);
 
-                query = AddToWhereClauseIfNonDefault(query, transaction => transaction.AccountId == accountId, accountId);
-                query = AddToWhereClauseIfNonDefault(query, transaction => transaction.TransactionCategory.CategoryId == categoryId, categoryId);
-                query = AddToWhereClauseIfNonDefault(query, transaction => transaction.Account.BankId == bankId, bankId);
+                query = AddToWhereClauseIfNonDefaultInt(query, transaction => transaction.AccountId == accountId, accountId);
+                query = AddToWhereClauseIfNonDefaultInt(query, transaction => transaction.TransactionCategory.CategoryId == categoryId, categoryId);
+                query = AddToWhereClauseIfNonDefaultInt(query, transaction => transaction.Account.BankId == bankId, bankId);
+                query = AddToWhereClauseIfNonDefaultString(query, transaction => transaction.Description.Contains(description), description);
 
                 return await query.ToListAsync();
             }
