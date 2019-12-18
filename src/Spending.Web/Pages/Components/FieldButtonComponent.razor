@@ -1,7 +1,7 @@
 ﻿@using Spending.Web.Data
 
 <div>
-    <input type="text" @bind="_text"/>
+    <input type="text" @bind="_text" placeholder="@PlaceHolder"/>
     <button @onclick="OnClicked">Search</button>
 </div>
 
@@ -9,6 +9,7 @@
 
     private string _text;
 
+    [Parameter] public string PlaceHolder { get; set; }
     [Parameter] public EventCallback<string> SetText { get; set; }
 
     public async Task OnClicked() => await SetText.InvokeAsync(_text);

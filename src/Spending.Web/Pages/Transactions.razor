@@ -13,7 +13,7 @@
 <GenericDropDownComponent Source="@Constants.Banks.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetBankId" AddAll="@true" SelectedId="-1" />
 <GenericDropDownComponent Source="@Constants.Accounts.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetAccountId" AddAll="@true" SelectedId="-1"/>
 <GenericDropDownComponent Source="@Constants.Categories.List.Select(s => new GenericDropDown {Id = s.Id, DisplayName = s.Name}).ToList()" SetSelectedId="@SetCategoryId" AddAll="@true" SelectedId="-1"/>
-<FieldButtonComponent SetText="@SetText"/>
+<FieldButtonComponent SetText="@SetText" PlaceHolder="Search for transactions"/>
 
 @if (_transactions != null)
 {
